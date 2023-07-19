@@ -1,8 +1,8 @@
 import 'dart:html';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:kalkulator_bbternak/components/calcInput.dart';
 import 'package:kalkulator_bbternak/components/calculator.dart';
 
 class SapiPage extends StatefulWidget {
@@ -36,10 +36,9 @@ class _SapiPageState extends State<SapiPage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    int penjumlahan(Map<String, TextEditingController> controllers) {
-      int? input1 = int.tryParse(controllers["input1"]!.text);
-      int? input2 = int.tryParse(controllers["input2"]!.text);
-      return input1! + input2!;
+    num schoorl(Map<String, TextEditingController> controllers) {
+      int? lingkarDada = int.tryParse(controllers["lingkarDada"]!.text);
+      return pow(lingkarDada! + 22, 2) / 100;
     }
 
     return Scaffold(
@@ -52,7 +51,7 @@ class _SapiPageState extends State<SapiPage> {
           Calculator(
               title: "penjumlahan",
               inputs: ["input1", "input2"],
-              calcFunc: penjumlahan)
+              calcFunc: schoorl)
           // Text("Testing aja"),
           // TextFormField(
           //   decoration: InputDecoration(label: Text("test1")),

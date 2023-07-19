@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:kalkulator_bbternak/components/calcInput.dart';
 
 class Calculator extends StatefulWidget {
   const Calculator({
@@ -26,13 +25,14 @@ class Calculator extends StatefulWidget {
 
 class _CalculatorState extends State<Calculator> {
   String output = "";
-  final List<TextEditingController> _controllers = [];
+  Map<String, TextEditingController> _controllers = {};
 
   @override
   void initState() {
     super.initState();
-    _controllers.addAll(
-        List.generate(widget.inputs.length, (_) => TextEditingController()));
+    _controllers = {
+      for (String label in widget.inputs) label: TextEditingController()
+    };
   }
 
   @override
@@ -47,20 +47,20 @@ class _CalculatorState extends State<Calculator> {
       Text(widget.title),
       Form(
         child: Row(
-          children: [
-            for (int i = 0; i < widget.inputs.length; i++)
-              TextFormField(
-                  // decoration: InputDecoration(label: Text(widget.inputs[i])),
-                  controller: _controllers[i],
-                  onChanged: (value) {
-                    List<int> inputData = _controllers
-                        .map((controller) => int.tryParse(controller.text) ?? 0)
-                        .toList();
-                    int result = widget.calcFunc(inputData);
-                    output = result.toString();
-                  }),
-          ],
-        ),
+            children: widget.inputs
+                .map((label) => Expanded(
+                        child: TextFormField(
+                      decoration: InputDecoration(label: Text(label)),
+                      controller: _controllers[label],
+                      onChanged: (value) {
+                        num result = widget.calcFunc(_controllers);
+                        setState(() {
+                          output = result.toString();
+                        });
+                      },
+                      keyboardType: TextInputType.number,
+                    )))
+                .toList()),
       ),
       Text(output)
     ]);
