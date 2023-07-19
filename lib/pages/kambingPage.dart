@@ -5,18 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kalkulator_bbternak/components/calculator.dart';
 
-class SapiPage extends StatefulWidget {
-  const SapiPage({super.key});
+class KambingPage extends StatefulWidget {
+  const KambingPage({super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
 
   @override
-  State<SapiPage> createState() => _SapiPageState();
+  State<KambingPage> createState() => _SapiPageState();
 }
 
-class _SapiPageState extends State<SapiPage> {
+class _SapiPageState extends State<KambingPage> {
   TextEditingController input1 = TextEditingController();
   TextEditingController input2 = TextEditingController();
   String output = "Result";
@@ -37,21 +37,39 @@ class _SapiPageState extends State<SapiPage> {
     // than having to individually change instances of widgets.
 
     num schoorl(Map<String, TextEditingController> controllers) {
-      int? lingkarDada = int.tryParse(controllers["lingkarDada"]!.text);
-      return pow(lingkarDada! + 22, 2) / 100;
+      num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
+      return pow(lingkarDada + 22, 2) / 100;
+    }
+
+    num winter(Map<String, TextEditingController> controllers) {
+      num lingkarDadaInch =
+          num.parse(controllers["lingkarDadaCm"]!.text) / 2.54;
+      num panjangBadanInch =
+          num.parse(controllers["panjangBadanCm"]!.text) / 2.54;
+
+      return pow(lingkarDadaInch, 2) * panjangBadanInch / 300;
+    }
+
+    num smith(Map<String, TextEditingController> controllers) {
+      num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
+      return pow(lingkarDada + 18, 2) / 100;
     }
 
     return Scaffold(
         appBar: AppBar(
-          // Here we take the value from the SapiPage object that was created by
+          // Here we take the value from the KambingPage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: Text("What is this"),
         ),
         body: ListView(children: [
           Calculator(
-              title: "penjumlahan",
-              inputs: ["input1", "input2"],
-              calcFunc: schoorl)
+              title: "Schoorl", inputs: ["lingkarDadaCm"], calcFunc: schoorl),
+          Calculator(
+              title: "Winter",
+              inputs: ["lingkarDadaCm", "panjangBadanCm"],
+              calcFunc: winter),
+          Calculator(
+              title: "Smith", inputs: ["lingkarDadaCm"], calcFunc: smith),
           // Text("Testing aja"),
           // TextFormField(
           //   decoration: InputDecoration(label: Text("test1")),

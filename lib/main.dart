@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kalkulator_bbternak/pages/kambingPage.dart';
 import 'package:kalkulator_bbternak/pages/sapiPage.dart';
 
 void main() {
@@ -28,6 +29,7 @@ class App extends StatelessWidget {
       home: const HomePage(title: 'Kalkulator BB Ternak'),
       routes: {
         '/sapi': (context) => SapiPage(),
+        '/kambing': (context) => KambingPage(),
       },
     );
   }
@@ -66,13 +68,21 @@ class _HomePageState extends State<HomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        child: ElevatedButton(
-          child: Text("Sapi cuy"),
-          onPressed: () {
-            Navigator.pushNamed(context, '/sapi');
-          },
-        ),
+      body: Column(
+        children: [
+          ElevatedButton(
+            child: Text("Sapi cuy"),
+            onPressed: () {
+              Navigator.pushNamed(context, '/sapi');
+            },
+          ),
+          ElevatedButton(
+            child: Text("Kambing cuy"),
+            onPressed: () {
+              Navigator.pushNamed(context, '/kambing');
+            },
+          ),
+        ],
       ),
     );
   }
