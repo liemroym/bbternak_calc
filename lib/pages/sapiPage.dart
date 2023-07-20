@@ -1,4 +1,5 @@
 import 'dart:html';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,48 +37,56 @@ class _SapiPageState extends State<SapiPage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    int penjumlahan(Map<String, TextEditingController> controllers) {
-      int? input1 = int.tryParse(controllers["input1"]!.text);
-      int? input2 = int.tryParse(controllers["input2"]!.text);
-      return input1! + input2!;
+    num schoorl(Map<String, TextEditingController> controllers) {
+      num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
+      return pow(lingkarDada + 22, 2) / 100;
+    }
+
+    num winter(Map<String, TextEditingController> controllers) {
+      num lingkarDadaInch =
+          num.parse(controllers["lingkarDadaCm"]!.text) / 2.54;
+      num panjangBadanInch =
+          num.parse(controllers["panjangBadanCm"]!.text) / 2.54;
+
+      return pow(lingkarDadaInch, 2) * panjangBadanInch / 300;
+    }
+
+    num smith(Map<String, TextEditingController> controllers) {
+      num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
+      return pow(lingkarDada + 18, 2) / 100;
+    }
+
+    num pedagingKejobongJantan(Map<String, TextEditingController> controllers) {
+      num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
+      return pow(lingkarDada - 15, 2) / 100;
     }
 
     return Scaffold(
         appBar: AppBar(
-          // Here we take the value from the SapiPage object that was created by
+          // Here we take the value from the KambingPage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: Text("What is this"),
         ),
         body: ListView(children: [
           Calculator(
-              title: "penjumlahan",
-              inputs: ["input1", "input2"],
-              calcFunc: penjumlahan)
-          // Text("Testing aja"),
-          // TextFormField(
-          //   decoration: InputDecoration(label: Text("test1")),
-          //   controller: input1,
-          //   onChanged: (value) {
-          //     int result =
-          //         penjumlahan(int.parse(input1.text), int.parse(input2.text));
-          //     setState(() {
-          //       output = result.toString();
-          //     });
-          //   },
-          //   keyboardType: TextInputType.number,
-          // ),
-          // TextFormField(
-          //     decoration: InputDecoration(label: Text("test2")),
-          //     controller: input2,
-          //     onChanged: (value) {
-          //       int result =
-          //           penjumlahan(int.parse(input1.text), int.parse(input2.text));
-          //       setState(() {
-          //         output = result.toString();
-          //       });
-          //     },
-          //     keyboardType: TextInputType.number),
-          // Text(output)
+              title: "Schoorl",
+              inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
+              calcFunc: schoorl),
+          Calculator(
+              title: "Winter",
+              inputs: {
+                "lingkarDadaCm": "Lingkar Dada (cm)",
+                "panjangBadanCm": "Panjang Badan (cm)",
+              },
+              calcFunc: winter),
+          Calculator(
+              title: "Smith",
+              inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
+              calcFunc: smith),
+          Calculator(
+              title: "Pedaging Kejobong Jantan",
+              inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
+              calcFunc: pedagingKejobongJantan),
         ]));
   }
 }

@@ -16,7 +16,7 @@ class Calculator extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
   final String title;
-  final List<String> inputs;
+  final Map<String, String> inputs; // {id: label}
   final Function calcFunc;
 
   @override
@@ -31,7 +31,8 @@ class _CalculatorState extends State<Calculator> {
   void initState() {
     super.initState();
     _controllers = {
-      for (String label in widget.inputs) label: TextEditingController()
+      for (var input in widget.inputs.entries)
+        input.key: TextEditingController()
     };
   }
 
@@ -47,11 +48,11 @@ class _CalculatorState extends State<Calculator> {
       Text(widget.title),
       Form(
         child: Row(
-            children: widget.inputs
-                .map((label) => Expanded(
+            children: widget.inputs.entries
+                .map((input) => Expanded(
                         child: TextFormField(
-                      decoration: InputDecoration(label: Text(label)),
-                      controller: _controllers[label],
+                      decoration: InputDecoration(label: Text(input.value)),
+                      controller: _controllers[input.key],
                       onChanged: (value) {
                         num result = widget.calcFunc(_controllers);
                         setState(() {

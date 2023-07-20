@@ -63,38 +63,20 @@ class _SapiPageState extends State<KambingPage> {
         ),
         body: ListView(children: [
           Calculator(
-              title: "Schoorl", inputs: ["lingkarDadaCm"], calcFunc: schoorl),
+              title: "Schoorl",
+              inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
+              calcFunc: schoorl),
           Calculator(
               title: "Winter",
-              inputs: ["lingkarDadaCm", "panjangBadanCm"],
+              inputs: {
+                "lingkarDadaCm": "Lingkar Dada (cm)",
+                "panjangBadanCm": "Panjang Badan (cm)"
+              },
               calcFunc: winter),
           Calculator(
-              title: "Smith", inputs: ["lingkarDadaCm"], calcFunc: smith),
-          // Text("Testing aja"),
-          // TextFormField(
-          //   decoration: InputDecoration(label: Text("test1")),
-          //   controller: input1,
-          //   onChanged: (value) {
-          //     int result =
-          //         penjumlahan(int.parse(input1.text), int.parse(input2.text));
-          //     setState(() {
-          //       output = result.toString();
-          //     });
-          //   },
-          //   keyboardType: TextInputType.number,
-          // ),
-          // TextFormField(
-          //     decoration: InputDecoration(label: Text("test2")),
-          //     controller: input2,
-          //     onChanged: (value) {
-          //       int result =
-          //           penjumlahan(int.parse(input1.text), int.parse(input2.text));
-          //       setState(() {
-          //         output = result.toString();
-          //       });
-          //     },
-          //     keyboardType: TextInputType.number),
-          // Text(output)
+              title: "Smith",
+              inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
+              calcFunc: smith),
         ]));
   }
 }
