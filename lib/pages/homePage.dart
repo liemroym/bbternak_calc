@@ -39,6 +39,10 @@ class _HomePageState extends State<HomePage> {
                 child: Padding(
               padding: EdgeInsets.all(20.0),
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                )),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -58,6 +62,10 @@ class _HomePageState extends State<HomePage> {
                 child: Padding(
               padding: EdgeInsets.all(20.0),
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                )),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

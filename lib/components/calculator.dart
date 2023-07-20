@@ -26,7 +26,7 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  String output = "";
+  String output = "0 kg";
   Map<String, TextEditingController> _controllers = {};
 
   @override
@@ -48,7 +48,7 @@ class _CalculatorState extends State<Calculator> {
   void _onTextChanged() {
     num result = widget.calcFunc(_controllers);
     setState(() {
-      output = result.toString();
+      output = "${result.toStringAsFixed(2)} kg";
     });
   }
 
@@ -60,23 +60,28 @@ class _CalculatorState extends State<Calculator> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Column(children: [
-      Text(widget.title),
+    return ExpansionTile(title: Text(widget.title), children: [
       Form(
         child: Row(
             children: widget.inputs.entries
                 .map((input) => Expanded(
+                    child: Padding(
+                        padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
                         child: TextFormField(
-                      decoration: InputDecoration(label: Text(input.value)),
-                      controller: _controllers[input.key],
-                      onChanged: (value) {
-                        _onTextChanged();
-                      },
-                      keyboardType: TextInputType.number,
-                    )))
+                          decoration: InputDecoration(label: Text(input.value)),
+                          controller: _controllers[input.key],
+                          onChanged: (value) {
+                            _onTextChanged();
+                          },
+                          keyboardType: TextInputType.number,
+                        ))))
                 .toList()),
       ),
-      Text(output)
+      Container(
+          margin: EdgeInsets.all(8.0),
+          child: Text(
+            output,
+          ))
     ]);
   }
 }
