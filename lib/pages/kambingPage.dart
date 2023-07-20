@@ -53,6 +53,11 @@ class _SapiPageState extends State<KambingPage> {
       return pow(lingkarDada + 18, 2) / 100;
     }
 
+    num pedagingKejobongJantan(Map<String, TextEditingController> controllers) {
+      num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
+      return pow(lingkarDada - 15, 2) / 100;
+    }
+
     Map<String, TextEditingController> sharedControllers = {
       "lingkarDadaCm": TextEditingController()
     };
@@ -61,7 +66,7 @@ class _SapiPageState extends State<KambingPage> {
         appBar: AppBar(
           // Here we take the value from the KambingPage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text("What is this"),
+          title: Text("Kambing"),
         ),
         body: ListView(children: [
           Calculator(
@@ -83,6 +88,12 @@ class _SapiPageState extends State<KambingPage> {
             title: "Smith",
             inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
             calcFunc: smith,
+            sharedControllers: sharedControllers,
+          ),
+          Calculator(
+            title: "Pedaging Kejobong Jantan",
+            inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
+            calcFunc: pedagingKejobongJantan,
             sharedControllers: sharedControllers,
           ),
         ]));

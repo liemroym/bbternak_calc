@@ -27,7 +27,7 @@ class App extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.green,
       ),
-      home: const HomePage(title: 'Kalkulator BB Ternak'),
+      home: const HomePage(),
       routes: {
         '/sapi': (context) => SapiPage(),
         '/kambing': (context) => KambingPage(),

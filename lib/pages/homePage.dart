@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -11,8 +11,6 @@ class HomePage extends StatefulWidget {
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
-
-  final String title;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -28,27 +26,54 @@ class _HomePageState extends State<HomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the HomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Column(
-        children: [
-          ElevatedButton(
-            child: Text("Sapi cuy"),
-            onPressed: () {
-              Navigator.pushNamed(context, '/sapi');
-            },
-          ),
-          ElevatedButton(
-            child: Text("Kambing cuy"),
-            onPressed: () {
-              Navigator.pushNamed(context, '/kambing');
-            },
-          ),
-        ],
-      ),
-    );
+        appBar: AppBar(
+          // Here we take the value from the HomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text("Kalkulator BB Ternak"),
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+                child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: ElevatedButton(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FractionallySizedBox(
+                        widthFactor: 0.5,
+                        child: Image.asset("assets/images/sapi.png",
+                            fit: BoxFit.cover),
+                      ),
+                      Text("Sapi")
+                    ]),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/sapi');
+                },
+              ),
+            )),
+            Expanded(
+                child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: ElevatedButton(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FractionallySizedBox(
+                        widthFactor: 0.5,
+                        child: Image.asset("assets/images/kambing.png",
+                            fit: BoxFit.cover),
+                      ),
+                      Text("Kambing")
+                    ]),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/kambing');
+                },
+              ),
+            ))
+          ],
+        ));
   }
 }
