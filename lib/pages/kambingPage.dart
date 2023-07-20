@@ -1,8 +1,6 @@
-import 'dart:html';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:kalkulator_bbternak/components/calculator.dart';
 
 class KambingPage extends StatefulWidget {
@@ -55,6 +53,10 @@ class _SapiPageState extends State<KambingPage> {
       return pow(lingkarDada + 18, 2) / 100;
     }
 
+    Map<String, TextEditingController> sharedControllers = {
+      "lingkarDadaCm": TextEditingController()
+    };
+
     return Scaffold(
         appBar: AppBar(
           // Here we take the value from the KambingPage object that was created by
@@ -63,20 +65,26 @@ class _SapiPageState extends State<KambingPage> {
         ),
         body: ListView(children: [
           Calculator(
-              title: "Schoorl",
-              inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
-              calcFunc: schoorl),
+            title: "Schoorl",
+            inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
+            calcFunc: schoorl,
+            sharedControllers: sharedControllers,
+          ),
           Calculator(
-              title: "Winter",
-              inputs: {
-                "lingkarDadaCm": "Lingkar Dada (cm)",
-                "panjangBadanCm": "Panjang Badan (cm)"
-              },
-              calcFunc: winter),
+            title: "Winter",
+            inputs: {
+              "lingkarDadaCm": "Lingkar Dada (cm)",
+              "panjangBadanCm": "Panjang Badan (cm)"
+            },
+            calcFunc: winter,
+            sharedControllers: sharedControllers,
+          ),
           Calculator(
-              title: "Smith",
-              inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
-              calcFunc: smith),
+            title: "Smith",
+            inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
+            calcFunc: smith,
+            sharedControllers: sharedControllers,
+          ),
         ]));
   }
 }

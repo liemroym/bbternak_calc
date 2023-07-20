@@ -6,9 +6,10 @@ class Calculator extends StatefulWidget {
     required this.title,
     required this.inputs,
     required this.calcFunc,
+    this.sharedControllers,
   });
   // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
+  // that it has a State object x(defined below) that contains fields that affect
   // how it looks.
 
   // This class is the configuration for the state. It holds the values (in this
@@ -18,6 +19,7 @@ class Calculator extends StatefulWidget {
   final String title;
   final Map<String, String> inputs; // {id: label}
   final Function calcFunc;
+  final Map<String, TextEditingController>? sharedControllers;
 
   @override
   State<Calculator> createState() => _CalculatorState();
@@ -34,6 +36,20 @@ class _CalculatorState extends State<Calculator> {
       for (var input in widget.inputs.entries)
         input.key: TextEditingController()
     };
+
+    if (widget.sharedControllers != null) {
+      for (var controller in widget.sharedControllers!.entries) {
+        controller.value.addListener(_onTextChanged);
+        _controllers[controller.key] = controller.value;
+      }
+    }
+  }
+
+  void _onTextChanged() {
+    num result = widget.calcFunc(_controllers);
+    setState(() {
+      output = result.toString();
+    });
   }
 
   @override
@@ -54,10 +70,7 @@ class _CalculatorState extends State<Calculator> {
                       decoration: InputDecoration(label: Text(input.value)),
                       controller: _controllers[input.key],
                       onChanged: (value) {
-                        num result = widget.calcFunc(_controllers);
-                        setState(() {
-                          output = result.toString();
-                        });
+                        _onTextChanged();
                       },
                       keyboardType: TextInputType.number,
                     )))
