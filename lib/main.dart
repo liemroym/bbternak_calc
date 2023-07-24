@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kalkulator_bbternak/pages/homePage.dart';
-import 'package:kalkulator_bbternak/pages/kambingPage.dart';
-import 'package:kalkulator_bbternak/pages/sapiPage.dart';
+import 'package:kalkulator_bbternak/pages/home_page.dart';
+import 'package:kalkulator_bbternak/pages/kambing_page.dart';
+import 'package:kalkulator_bbternak/pages/sapi_page.dart';
 
 void main() {
   runApp(const App());
