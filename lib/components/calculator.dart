@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Calculator extends StatefulWidget {
   const Calculator({
@@ -28,7 +29,8 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  String output = "0 kg";
+  String weight = "0 kg", priceJateng = "Rp. 0", priceKlaten = "Rp. 0";
+
   Map<String, TextEditingController> _controllers = {};
 
   @override
@@ -48,9 +50,17 @@ class _CalculatorState extends State<Calculator> {
   }
 
   void _onTextChanged() {
-    num result = widget.calcFunc(_controllers);
+    num weightCalc = widget.calcFunc(_controllers);
+    num? priceJatengCalc, priceKlatenCalc;
+    if (widget.prices != null) {
+      priceJatengCalc = widget.prices!["priceJateng"]! * weightCalc;
+      priceKlatenCalc = widget.prices!["priceKlaten"]! * weightCalc;
+    }
+
     setState(() {
-      output = "${result.toStringAsFixed(2)} kg";
+      weight = "${NumberFormat('#,##0.00').format(weightCalc)} kg";
+      priceJateng = "Rp. ${NumberFormat('#,##0.00').format(priceJatengCalc)}";
+      priceKlaten = "Rp. ${NumberFormat('#,##0.00').format(priceKlatenCalc)}";
     });
   }
 
@@ -81,8 +91,22 @@ class _CalculatorState extends State<Calculator> {
       ),
       Container(
           margin: EdgeInsets.all(8.0),
-          child: Text(
-            output,
+          child: Row(
+            children: [
+              const Spacer(),
+              Text(
+                weight,
+              ),
+              const Spacer(),
+              Text(
+                priceJateng,
+              ),
+              const Spacer(),
+              Text(
+                priceKlaten,
+              ),
+              const Spacer(),
+            ],
           ))
     ]);
   }

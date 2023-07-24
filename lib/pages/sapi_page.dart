@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:excel/excel.dart';
+import 'package:intl/intl.dart';
 import 'package:kalkulator_bbternak/components/calculator.dart';
 
 class SapiPage extends StatefulWidget {
@@ -14,34 +16,30 @@ class SapiPage extends StatefulWidget {
 }
 
 class _SapiPageState extends State<SapiPage> {
-  List<int?>? priceJateng, priceKlaten;
+  static const int PRICE_DATA = 30;
+  List<int?>? priceJateng = [], priceKlaten = [];
+  List<String?>? priceDates = [];
   int? lastPriceJateng, lastPriceKlaten;
 
-  String formatDate(DateTime dateTime, {bool reversed = true}) {
-    String day = dateTime.day.toString().padLeft(2, '0');
-    String month = dateTime.month.toString().padLeft(2, '0');
-    String year = dateTime.year.toString();
-
-    if (!reversed) {
-      return '$day-$month-$year';
-    } else {
-      return '$year-$month-$day';
-    }
-  }
-
-  Future<Map<String, List<int?>?>> fetchPriceData(
+  Future<Map<String, List<dynamic?>?>> fetchPriceData(
       DateTime dateStart, DateTime dateEnd) async {
     int dateDiff = dateEnd.difference(dateStart).inDays;
 
+    // Response is in excel
     final response = await http.post(
       Uri.parse(
-          'https://simponiternak.pertanian.go.id/download-harga-komoditas.php?i_laporan=1&data_tanggal_1=${formatDate(dateStart, reversed: false)}&data_tanggal_2=${formatDate(dateEnd, reversed: false)}&data_bulan_1={2012-01}&data_bulan_2=${formatDate(dateEnd).substring(0, 7)}&data_tahun_1=2012&data_tahun_2=${formatDate(dateEnd).substring(0, 4)}&i_komoditas=3&i_type=1&i_showcity=provkab&i_kabupaten[]=3310&i_provinsi[]=33&'),
+          'https://simponiternak.pertanian.go.id/download-harga-komoditas.php?i_laporan=1&data_tanggal_1=${DateFormat("dd-MM-yyyy").format(dateStart)}&data_tanggal_2=${DateFormat("dd-MM-yyyy").format(dateEnd)}&data_bulan_1={2012-01}&data_bulan_2=${DateFormat("yyyy-MM").format(dateEnd)}&data_tahun_1=2012&data_tahun_2=${DateFormat("yyyy").format(dateEnd)}&i_komoditas=3&i_type=1&i_showcity=provkab&i_kabupaten[]=3310&i_provinsi[]=33&'),
     );
 
     final bytes = response.bodyBytes;
     var excel = Excel.decodeBytes(bytes);
     var sheet = excel.tables[excel.tables.keys.first];
 
+    // Get price from excel
+    List<String?>? dates = sheet?.rows[7]
+        .getRange(4, 4 + dateDiff)
+        .map((e) => e?.value.toString())
+        .toList();
     List<String?>? pricesJateng = sheet?.rows[9]
         .getRange(4, 4 + dateDiff)
         .map((e) => e?.value.toString())
@@ -51,6 +49,7 @@ class _SapiPageState extends State<SapiPage> {
         .map((e) => e?.value.toString())
         .toList();
 
+    // Excel converted price is in ISO DateTime and needs to be converted to integer
     List<int?>? pricesJatengConverted = pricesJateng
         ?.map((e) => (e == null
             ? null
@@ -69,8 +68,9 @@ class _SapiPageState extends State<SapiPage> {
 
     if (response.statusCode == 200) {
       return {
-        "hargaJateng": pricesJatengConverted,
-        "hargaKlaten": pricesKlatenConverted
+        "priceJateng": pricesJatengConverted,
+        "priceKlaten": pricesKlatenConverted,
+        "priceDates": dates
       };
     } else {
       throw Exception('Failed to load album');
@@ -85,13 +85,16 @@ class _SapiPageState extends State<SapiPage> {
 
   void initPrice() async {
     try {
-      fetchPriceData(
-              DateTime.now().subtract(const Duration(days: 7)), DateTime.now())
+      // Fetch past 7 days data from government website
+      fetchPriceData(DateTime.now().subtract(const Duration(days: PRICE_DATA)),
+              DateTime.now())
+          // Add timeout for 5 second
           .timeout(Duration(seconds: 5))
           .then((value) => {
                 setState(() {
-                  priceJateng = value["hargaJateng"];
-                  priceKlaten = value["hargaKlaten"];
+                  priceJateng = value["priceJateng"]?.cast<int?>();
+                  priceKlaten = value["priceKlaten"]?.cast<int?>();
+                  priceDates = value["priceDates"]?.cast<String?>();
                 })
               })
           .then(((value) => setState((() {
@@ -99,6 +102,7 @@ class _SapiPageState extends State<SapiPage> {
                 lastPriceKlaten = priceKlaten?.whereType<int>().toList().last;
               }))));
     } on TimeoutException catch (_) {
+      // Handle timeout
       print("Timeout bang");
     }
   }
@@ -142,6 +146,54 @@ class _SapiPageState extends State<SapiPage> {
         title: Text("Sapi"),
       ),
       body: ListView(children: [
+        Container(
+          width: 100,
+          height: 300,
+          margin: EdgeInsets.only(bottom: 20),
+          child: LineChart(LineChartData(
+              minX: 0,
+              maxX: PRICE_DATA.toDouble(),
+              minY: 0,
+              maxY: 100000,
+              titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: PRICE_DATA / 6,
+                          getTitlesWidget: (value, meta) {
+                            if (priceDates != null) {
+                              var date = value.toInt() < priceDates!.length
+                                  ? priceDates![value.toInt()]
+                                  : "";
+
+                              return Transform.rotate(
+                                  angle: -0.2,
+                                  child: SideTitleWidget(
+                                      axisSide: meta.axisSide,
+                                      child: Text(
+                                        "$date",
+                                        style: TextStyle(fontSize: 10),
+                                      )));
+                            } else {
+                              return SideTitleWidget(
+                                  child: Text(""), axisSide: meta.axisSide);
+                            }
+                          })),
+                  topTitles: SideTitleWidget(
+                    child: Text(""),
+                  ),
+                  rightTitles: SideTitleWidget(
+                    child: Text(""),
+                  )),
+              lineBarsData: [
+                LineChartBarData(
+                    spots: priceJateng!.asMap().entries.map((price) {
+                  return FlSpot(price.key.toDouble(), price.value!.toDouble());
+                }).toList())
+              ])),
+        ),
+        Text("Harga Jateng: ${lastPriceJateng.toString()}"),
+        Text("Harga Klaten: ${lastPriceKlaten.toString()}"),
         Calculator(
           title: "Schoorl",
           inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
@@ -175,8 +227,6 @@ class _SapiPageState extends State<SapiPage> {
           },
           sharedControllers: sharedControllers,
         ),
-        Text(lastPriceJateng.toString()),
-        Text(lastPriceKlaten.toString()),
       ]),
     );
   }
