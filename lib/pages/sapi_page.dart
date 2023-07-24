@@ -19,7 +19,7 @@ class _SapiPageState extends State<SapiPage> {
   static const int PRICE_DATA = 30;
   List<int?>? priceJateng = [], priceKlaten = [];
   List<String?>? priceDates = [];
-  int? lastPriceJateng, lastPriceKlaten;
+  int? lastPriceJateng = 0, lastPriceKlaten = 0;
 
   Future<Map<String, List<dynamic?>?>> fetchPriceData(
       DateTime dateStart, DateTime dateEnd) async {
@@ -147,44 +147,43 @@ class _SapiPageState extends State<SapiPage> {
       ),
       body: ListView(children: [
         Container(
-          width: 100,
-          height: 300,
-          margin: EdgeInsets.only(bottom: 20),
+          width: 50,
+          height: 200,
+          margin: EdgeInsets.all(20),
           child: LineChart(LineChartData(
               minX: 0,
               maxX: PRICE_DATA.toDouble(),
               minY: 0,
               maxY: 100000,
               titlesData: FlTitlesData(
-                  bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                          showTitles: true,
-                          interval: PRICE_DATA / 6,
-                          getTitlesWidget: (value, meta) {
-                            if (priceDates != null) {
-                              var date = value.toInt() < priceDates!.length
-                                  ? priceDates![value.toInt()]
-                                  : "";
+                topTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: PRICE_DATA / 6,
+                        getTitlesWidget: (value, meta) {
+                          if (priceDates != null) {
+                            var date = value.toInt() < priceDates!.length
+                                ? priceDates![value.toInt()]
+                                : "";
 
-                              return Transform.rotate(
-                                  angle: -0.2,
-                                  child: SideTitleWidget(
-                                      axisSide: meta.axisSide,
-                                      child: Text(
-                                        "$date",
-                                        style: TextStyle(fontSize: 10),
-                                      )));
-                            } else {
-                              return SideTitleWidget(
-                                  child: Text(""), axisSide: meta.axisSide);
-                            }
-                          })),
-                  topTitles: SideTitleWidget(
-                    child: Text(""),
-                  ),
-                  rightTitles: SideTitleWidget(
-                    child: Text(""),
-                  )),
+                            return Transform.rotate(
+                                angle: -0.2,
+                                child: SideTitleWidget(
+                                    axisSide: meta.axisSide,
+                                    child: Text(
+                                      "$date",
+                                      style: TextStyle(fontSize: 10),
+                                    )));
+                          } else {
+                            return SideTitleWidget(
+                                child: Text(""), axisSide: meta.axisSide);
+                          }
+                        })),
+              ),
               lineBarsData: [
                 LineChartBarData(
                     spots: priceJateng!.asMap().entries.map((price) {
@@ -192,8 +191,18 @@ class _SapiPageState extends State<SapiPage> {
                 }).toList())
               ])),
         ),
-        Text("Harga Jateng: ${lastPriceJateng.toString()}"),
-        Text("Harga Klaten: ${lastPriceKlaten.toString()}"),
+        Container(
+          margin: EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Spacer(),
+              Text("Harga Jateng: ${lastPriceJateng.toString()}"),
+              Spacer(),
+              Text("Harga Klaten: ${lastPriceKlaten.toString()}"),
+              Spacer(),
+            ],
+          ),
+        ),
         Calculator(
           title: "Schoorl",
           inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
