@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:http/http.dart' as http;
@@ -8,16 +9,13 @@ import 'package:kalkulator_bbternak/components/calculator.dart';
 class SapiPage extends StatefulWidget {
   const SapiPage({super.key});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
   @override
   State<SapiPage> createState() => _SapiPageState();
 }
 
 class _SapiPageState extends State<SapiPage> {
   List<int?>? priceJateng, priceKlaten;
+  int? lastPriceJateng, lastPriceKlaten;
 
   String formatDate(DateTime dateTime, {bool reversed = true}) {
     String day = dateTime.day.toString().padLeft(2, '0');
@@ -70,16 +68,11 @@ class _SapiPageState extends State<SapiPage> {
         .toList();
 
     if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      // return prices.join("\n");
       return {
         "hargaJateng": pricesJatengConverted,
         "hargaKlaten": pricesKlatenConverted
       };
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
       throw Exception('Failed to load album');
     }
   }
@@ -87,14 +80,27 @@ class _SapiPageState extends State<SapiPage> {
   @override
   void initState() {
     super.initState();
-    fetchPriceData(
-            DateTime.now().subtract(const Duration(days: 7)), DateTime.now())
-        .then((value) => {
-              setState(() {
-                priceJateng = value["priceJateng"];
-                priceKlaten = value["priceKlaten"];
+    initPrice();
+  }
+
+  void initPrice() async {
+    try {
+      fetchPriceData(
+              DateTime.now().subtract(const Duration(days: 7)), DateTime.now())
+          .timeout(Duration(seconds: 5))
+          .then((value) => {
+                setState(() {
+                  priceJateng = value["hargaJateng"];
+                  priceKlaten = value["hargaKlaten"];
+                })
               })
-            });
+          .then(((value) => setState((() {
+                lastPriceJateng = priceJateng?.whereType<int>().toList().last;
+                lastPriceKlaten = priceKlaten?.whereType<int>().toList().last;
+              }))));
+    } on TimeoutException catch (_) {
+      print("Timeout bang");
+    }
   }
 
   @override
@@ -140,6 +146,10 @@ class _SapiPageState extends State<SapiPage> {
           title: "Schoorl",
           inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
           calcFunc: schoorl,
+          prices: {
+            "priceJateng": lastPriceJateng,
+            "priceKlaten": lastPriceKlaten
+          },
           sharedControllers: sharedControllers,
         ),
         Calculator(
@@ -149,14 +159,24 @@ class _SapiPageState extends State<SapiPage> {
             "panjangBadanCm": "Panjang Badan (cm)",
           },
           calcFunc: winter,
+          prices: {
+            "priceJateng": lastPriceJateng,
+            "priceKlaten": lastPriceKlaten
+          },
           sharedControllers: sharedControllers,
         ),
         Calculator(
           title: "Smith",
           inputs: {"lingkarDadaCm": "Lingkar Dada (cm)"},
           calcFunc: smith,
+          prices: {
+            "priceJateng": lastPriceJateng,
+            "priceKlaten": lastPriceKlaten
+          },
           sharedControllers: sharedControllers,
         ),
+        Text(lastPriceJateng.toString()),
+        Text(lastPriceKlaten.toString()),
       ]),
     );
   }

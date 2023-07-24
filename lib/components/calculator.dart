@@ -6,6 +6,7 @@ class Calculator extends StatefulWidget {
     required this.title,
     required this.inputs,
     required this.calcFunc,
+    this.prices,
     this.sharedControllers,
   });
   // This widget is the home page of your application. It is stateful, meaning
@@ -19,6 +20,7 @@ class Calculator extends StatefulWidget {
   final String title;
   final Map<String, String> inputs; // {id: label}
   final Function calcFunc;
+  final Map<String, int?>? prices;
   final Map<String, TextEditingController>? sharedControllers;
 
   @override
