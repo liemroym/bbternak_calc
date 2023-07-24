@@ -77,7 +77,6 @@ class _SapiPageState extends State<SapiPage> {
       final response = await http.post(
         Uri.parse(
             'https://simponiternak.pertanian.go.id/download-harga-komoditas.php?i_laporan=1&data_tanggal_1=${formatDate(dateStart, reversed: false)}&data_tanggal_2=${formatDate(dateEnd, reversed: false)}&data_bulan_1={2012-01}&data_bulan_2=${formatDate(dateEnd).substring(0, 7)}&data_tahun_1=2012&data_tahun_2=${formatDate(dateEnd).substring(0, 4)}&i_komoditas=3&i_type=1&i_showcity=provkab&i_kabupaten[]=3310&i_provinsi[]=33&'),
-        // body: reqBody
       );
 
       final bytes = response.bodyBytes;
@@ -95,6 +94,20 @@ class _SapiPageState extends State<SapiPage> {
           .map((e) => e?.value.toString())
           .toList();
 
+      pricesJateng = pricesJateng
+          ?.map((e) => (e == null
+              ? null
+              : (DateTime.parse(e).difference(DateTime(1900, 1, 1)).inDays + 2)
+                  .toString()))
+          .toList();
+
+      pricesKlaten = pricesKlaten
+          ?.map((e) => e == null
+              ? null
+              : (DateTime.parse(e).difference(DateTime(1900, 1, 1)).inDays + 2)
+                  .toString())
+          .toList();
+
       // print(sheet?.rows[9].getRange(4, dateDiff));
 
       // for (var row in sheet!.rows) {
@@ -109,7 +122,7 @@ class _SapiPageState extends State<SapiPage> {
         // If the server did return a 200 OK response,
         // then parse the JSON.
         // return prices.join("\n");
-        return pricesJateng!.join(" ");
+        return pricesKlaten!.join(" ");
       } else {
         // If the server did not return a 200 OK response,
         // then throw an exception.
