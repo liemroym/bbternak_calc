@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:http/http.dart' as http;
@@ -8,8 +7,8 @@ import 'package:excel/excel.dart';
 import 'package:intl/intl.dart';
 import 'package:kalkulator_bbternak/components/calculator.dart';
 
-class SapiPage extends StatefulWidget {
-  const SapiPage(
+class CalculatorPage extends StatefulWidget {
+  const CalculatorPage(
       {super.key,
       required this.title,
       required this.calcData,
@@ -20,14 +19,14 @@ class SapiPage extends StatefulWidget {
   final int ternakId;
 
   @override
-  State<SapiPage> createState() => _SapiPageState();
+  State<CalculatorPage> createState() => _CalculatorPageState();
 }
 
-class _SapiPageState extends State<SapiPage> {
-  static const int priceData = 30;
-  List<int?>? priceJateng = [], priceKlaten = [];
-  List<String?>? priceDates = [];
-  int? lastPriceJateng = 0, lastPriceKlaten = 0;
+class _CalculatorPageState extends State<CalculatorPage> {
+  static const int priceDuration = 30;
+  List<int?> priceJateng = [], priceKlaten = [];
+  List<String?> priceDates = [];
+  int lastPriceJateng = 0, lastPriceKlaten = 0;
   Future<Map<String, List<dynamic>?>> fetchPriceData(
       DateTime dateStart, DateTime dateEnd) async {
     int dateDiff = dateEnd.difference(dateStart).inDays;
@@ -44,30 +43,33 @@ class _SapiPageState extends State<SapiPage> {
     var sheet = excel.tables[excel.tables.keys.first];
 
     // Get price from excel
-    List<String?>? dates = sheet?.rows[7]
-        .getRange(4, 4 + dateDiff)
-        .map((e) => e?.value.toString())
-        .toList();
-    List<String?>? pricesJateng = sheet?.rows[9]
-        .getRange(4, 4 + dateDiff)
-        .map((e) => e?.value.toString())
-        .toList();
-    List<String?>? pricesKlaten = sheet?.rows[10]
-        .getRange(4, 4 + dateDiff)
-        .map((e) => e?.value.toString())
-        .toList();
+    List<String?> dates = sheet?.rows[7]
+            .getRange(4, 4 + dateDiff)
+            .map((e) => e?.value.toString())
+            .toList() ??
+        [];
+    List<String?> pricesJateng = sheet?.rows[9]
+            .getRange(4, 4 + dateDiff)
+            .map((e) => e?.value.toString())
+            .toList() ??
+        [];
+    List<String?> pricesKlaten = sheet?.rows[10]
+            .getRange(4, 4 + dateDiff)
+            .map((e) => e?.value.toString())
+            .toList() ??
+        [];
 
     // Excel converted price is in ISO DateTime and needs to be converted to integer
-    List<int?>? pricesJatengConverted = pricesJateng
-        ?.map((e) => (e == null
+    List<int?> pricesJatengConverted = pricesJateng
+        .map((e) => (e == null
             ? null
             : (DateTime.parse(e).difference(DateTime(1900, 1, 1)).inDays + 2)
                 .toString()))
         .map((e) => e == null ? null : int.tryParse(e))
         .toList();
 
-    List<int?>? pricesKlatenConverted = pricesKlaten
-        ?.map((e) => (e == null
+    List<int?> pricesKlatenConverted = pricesKlaten
+        .map((e) => (e == null
             ? null
             : (DateTime.parse(e).difference(DateTime(1900, 1, 1)).inDays + 2)
                 .toString()))
@@ -81,7 +83,7 @@ class _SapiPageState extends State<SapiPage> {
         "priceDates": dates
       };
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Error bang');
     }
   }
 
@@ -93,25 +95,33 @@ class _SapiPageState extends State<SapiPage> {
 
   void initPrice() async {
     try {
-      // Fetch past 7 days data from government website
-      fetchPriceData(DateTime.now().subtract(const Duration(days: priceData)),
+      // Fetch past  days data from government website
+      fetchPriceData(
+              DateTime.now().subtract(const Duration(days: priceDuration)),
               DateTime.now())
           // Add timeout for 5 second
           .timeout(Duration(seconds: 5))
           .then((value) => {
                 setState(() {
-                  priceJateng = value["priceJateng"]?.cast<int?>();
-                  priceKlaten = value["priceKlaten"]?.cast<int?>();
-                  priceDates = value["priceDates"]?.cast<String?>();
+                  priceJateng = value["priceJateng"]!.cast<int?>();
+                  priceKlaten = value["priceKlaten"]!.cast<int?>();
+                  priceDates = value["priceDates"]!.cast<String?>();
                 })
               })
           .then(((value) => setState((() {
-                lastPriceJateng = priceJateng?.whereType<int>().toList().last;
-                lastPriceKlaten = priceKlaten?.whereType<int>().toList().last;
+                List<int>? priceJatengFiltered =
+                    priceJateng.whereType<int>().toList();
+                List<int>? priceKlatenFiltered =
+                    priceKlaten.whereType<int>().toList();
+
+                lastPriceJateng = priceJatengFiltered.last;
+                lastPriceKlaten = priceKlatenFiltered.last;
               }))));
     } on TimeoutException catch (_) {
       // Handle timeout
       print("Timeout bang");
+    } catch (err) {
+      print("error");
     }
   }
 
@@ -134,7 +144,7 @@ class _SapiPageState extends State<SapiPage> {
           margin: EdgeInsets.all(20),
           child: LineChart(LineChartData(
               minX: 0,
-              maxX: priceData.toDouble(),
+              maxX: priceDuration.toDouble(),
               minY: 0,
               maxY: 100000,
               titlesData: FlTitlesData(
@@ -145,11 +155,11 @@ class _SapiPageState extends State<SapiPage> {
                 bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                         showTitles: true,
-                        interval: priceData / 6,
+                        interval: priceDuration / 6,
                         getTitlesWidget: (value, meta) {
                           if (priceDates != null) {
-                            var date = value.toInt() < priceDates!.length
-                                ? priceDates![value.toInt()]
+                            var date = value.toInt() < priceDates.length
+                                ? priceDates[value.toInt()]
                                 : "";
 
                             return Transform.rotate(
@@ -168,8 +178,13 @@ class _SapiPageState extends State<SapiPage> {
               ),
               lineBarsData: [
                 LineChartBarData(
-                    spots: priceJateng!.asMap().entries.map((price) {
-                  return FlSpot(price.key.toDouble(), price.value!.toDouble());
+                    spots: priceJateng.asMap().entries.map((price) {
+                  if (price.value != null) {
+                    return FlSpot(
+                        price.key.toDouble(), price.value!.toDouble());
+                  } else {
+                    return FlSpot(1, 1);
+                  }
                 }).toList())
               ])),
         ),
