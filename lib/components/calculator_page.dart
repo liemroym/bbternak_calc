@@ -114,8 +114,17 @@ class _CalculatorPageState extends State<CalculatorPage> {
                 List<int>? priceKlatenFiltered =
                     priceKlaten.whereType<int>().toList();
 
-                lastPriceJateng = priceJatengFiltered.last;
-                lastPriceKlaten = priceKlatenFiltered.last;
+                if (priceJatengFiltered.isNotEmpty) {
+                  lastPriceJateng = priceJatengFiltered.last;
+                } else {
+                  lastPriceJateng = 0;
+                }
+
+                if (priceKlatenFiltered.isNotEmpty) {
+                  lastPriceKlaten = priceKlatenFiltered.last;
+                } else {
+                  lastPriceKlaten = 0;
+                }
               }))));
     } on TimeoutException catch (_) {
       // Handle timeout
@@ -178,14 +187,31 @@ class _CalculatorPageState extends State<CalculatorPage> {
               ),
               lineBarsData: [
                 LineChartBarData(
-                    spots: priceJateng.asMap().entries.map((price) {
-                  if (price.value != null) {
-                    return FlSpot(
-                        price.key.toDouble(), price.value!.toDouble());
-                  } else {
-                    return FlSpot(1, 1);
-                  }
-                }).toList())
+                  color: Colors.red,
+                  spots: priceJateng
+                      .asMap()
+                      .entries
+                      .map((price) {
+                        if (price.value != null) {
+                          return FlSpot(
+                              price.key.toDouble(), price.value!.toDouble());
+                        }
+                      })
+                      .whereType<FlSpot>()
+                      .toList(),
+                ),
+                LineChartBarData(
+                    spots: priceKlaten
+                        .asMap()
+                        .entries
+                        .map((price) {
+                          if (price.value != null) {
+                            return FlSpot(
+                                price.key.toDouble(), price.value!.toDouble());
+                          }
+                        })
+                        .whereType<FlSpot>()
+                        .toList())
               ])),
         ),
         Container(
