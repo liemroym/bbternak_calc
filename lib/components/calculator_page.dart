@@ -53,50 +53,58 @@ class _CalculatorPageState extends State<CalculatorPage> {
           .toList();
     }
 
-    int dateDiff = dateEnd.difference(dateStart).inDays;
-    final String apiUrl =
-        'https://simponiternak.pertanian.go.id/download-harga-komoditas.php?i_laporan=1&data_tanggal_1=${DateFormat("dd-MM-yyyy").format(dateStart)}&data_tanggal_2=${DateFormat("dd-MM-yyyy").format(dateEnd)}&data_bulan_1=2012-01&data_bulan_2=${DateFormat("yyyy-MM").format(dateEnd)}&data_tahun_1=2012&data_tahun_2=${DateFormat("yyyy").format(dateEnd)}&i_komoditas=${widget.ternakId}&i_type=1&i_showcity=provkab&i_kabupaten[]=3310&i_kabupaten[]=3471&i_provinsi[]=33&i_provinsi[]=34&';
-
-    // Response is in excel
-    final http.Response response;
     try {
+      int dateDiff = dateEnd.difference(dateStart).inDays;
+      final String apiUrl =
+          'https://simponiternak.pertanian.go.id/download-harga-komoditas.php?i_laporan=1&data_tanggal_1=${DateFormat("dd-MM-yyyy").format(dateStart)}&data_tanggal_2=${DateFormat("dd-MM-yyyy").format(dateEnd)}&data_bulan_1=2012-01&data_bulan_2=${DateFormat("yyyy-MM").format(dateEnd)}&data_tahun_1=2012&data_tahun_2=${DateFormat("yyyy").format(dateEnd)}&i_komoditas=${widget.ternakId}&i_type=1&i_showcity=provkab&i_kabupaten[]=3310&i_kabupaten[]=3471&i_provinsi[]=33&i_provinsi[]=34&';
+
+      // Response is in excel
+      final http.Response response;
       response = await http.post(
         Uri.parse(apiUrl),
       );
-    } catch (err) {
-      throw Exception(
-          "Tidak dapat mengambil data harga, pastikan anda terhubung dengan koneksi internet");
-    }
 
-    final bytes = response.bodyBytes;
-    Excel excel = Excel.decodeBytes(bytes);
-    Sheet? sheet = excel.tables[excel.tables.keys.first];
+      final bytes = response.bodyBytes;
+      final Excel excel;
+      try {
+        excel = Excel.decodeBytes(bytes);
+      } catch (_) {
+        return fetchPriceData(
+            DateTime.now().subtract(Duration(days: priceDuration + 1)),
+            DateTime.now().subtract(Duration(days: 1)));
+      }
+      Sheet? sheet = excel.tables[excel.tables.keys.first];
 
-    // Get price from excel
-    List<String?> dates = getDataFromRow(sheet, 7, 4, 4 + dateDiff);
-    List<String?> pricesJatengDateTime =
-        getDataFromRow(sheet, 9, 4, 4 + dateDiff);
-    List<String?> pricesKlatenDateTime =
-        getDataFromRow(sheet, 10, 4, 4 + dateDiff);
-    List<String?> pricesYogyaDateTime =
-        getDataFromRow(sheet, 11, 4, 4 + dateDiff);
+      // Get price from excel
+      List<String?> dates = getDataFromRow(sheet, 7, 4, 4 + dateDiff);
+      List<String?> pricesJatengDateTime =
+          getDataFromRow(sheet, 9, 4, 4 + dateDiff);
+      List<String?> pricesKlatenDateTime =
+          getDataFromRow(sheet, 10, 4, 4 + dateDiff);
+      List<String?> pricesYogyaDateTime =
+          getDataFromRow(sheet, 11, 4, 4 + dateDiff);
 
-    // Excel converted price is in ISO DateTime and needs to be converted to integer
-    List<int?> pricesJatengConverted =
-        convertDateTimeStringToInt(pricesJatengDateTime);
-    List<int?> pricesKlatenConverted =
-        convertDateTimeStringToInt(pricesKlatenDateTime);
-    List<int?> pricesYogyaConverted =
-        convertDateTimeStringToInt(pricesYogyaDateTime);
+      // Excel converted price is in ISO DateTime and needs to be converted to integer
+      List<int?> pricesJatengConverted =
+          convertDateTimeStringToInt(pricesJatengDateTime);
+      List<int?> pricesKlatenConverted =
+          convertDateTimeStringToInt(pricesKlatenDateTime);
+      List<int?> pricesYogyaConverted =
+          convertDateTimeStringToInt(pricesYogyaDateTime);
 
-    if (response.statusCode == 200) {
-      return {
-        "priceJateng": pricesJatengConverted,
-        "priceKlaten": pricesKlatenConverted,
-        "priceYogya": pricesYogyaConverted,
-        "priceDates": dates
-      };
-    } else {
+      if (response.statusCode == 200) {
+        return {
+          "priceJateng": pricesJatengConverted,
+          "priceKlaten": pricesKlatenConverted,
+          "priceYogya": pricesYogyaConverted,
+          "priceDates": dates
+        };
+      } else {
+        throw Exception(
+            "Tidak dapat mengambil data harga, pastikan anda terhubung dengan koneksi internet");
+      }
+    } catch (_) {
+      print(_);
       throw Exception(
           "Tidak dapat mengambil data harga, pastikan anda terhubung dengan koneksi internet");
     }
@@ -114,9 +122,28 @@ class _CalculatorPageState extends State<CalculatorPage> {
       Map<String, List<dynamic>?> value = await fetchPriceData(
               DateTime.now().subtract(const Duration(days: priceDuration)),
               DateTime.now())
+          // Add timeout for 10 seconds
           .timeout(Duration(seconds: 10));
 
-      // Add timeout for 5 second
+      LineChartBarData getChartSpotsFromList(Color color, List<int?> data) {
+        return LineChartBarData(
+          isCurved: true,
+          barWidth: 5,
+          isStrokeCapRound: true,
+          color: color,
+          spots: data
+              .asMap()
+              .entries
+              .map((price) {
+                if (price.value != null) {
+                  return FlSpot(price.key.toDouble(), price.value!.toDouble());
+                }
+              })
+              .whereType<FlSpot>()
+              .toList(),
+        );
+      }
+
       setState(() {
         priceJateng = value["priceJateng"]!.cast<int?>();
         priceKlaten = value["priceKlaten"]!.cast<int?>();
@@ -133,11 +160,34 @@ class _CalculatorPageState extends State<CalculatorPage> {
             priceKlatenFiltered.isNotEmpty ? priceKlatenFiltered.last : 0;
         lastPriceYogya =
             priceYogyaFiltered.isNotEmpty ? priceYogyaFiltered.last : 0;
+
         priceChart = LineChart(LineChartData(
             minX: 0,
             maxX: priceDuration.toDouble(),
             minY: 0,
             maxY: 100000,
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: true,
+              horizontalInterval: 1,
+              verticalInterval: 1,
+              getDrawingHorizontalLine: (value) {
+                return FlLine(
+                  color: Colors.white,
+                  strokeWidth: 1,
+                );
+              },
+              getDrawingVerticalLine: (value) {
+                return FlLine(
+                  color: Colors.white,
+                  strokeWidth: 1,
+                );
+              },
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border.all(color: const Color(0xff37434d)),
+            ),
             titlesData: FlTitlesData(
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
@@ -167,45 +217,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       })),
             ),
             lineBarsData: [
-              LineChartBarData(
-                color: Colors.red,
-                spots: priceJateng
-                    .asMap()
-                    .entries
-                    .map((price) {
-                      if (price.value != null) {
-                        return FlSpot(
-                            price.key.toDouble(), price.value!.toDouble());
-                      }
-                    })
-                    .whereType<FlSpot>()
-                    .toList(),
-              ),
-              LineChartBarData(
-                  color: Colors.yellow,
-                  spots: priceKlaten
-                      .asMap()
-                      .entries
-                      .map((price) {
-                        if (price.value != null) {
-                          return FlSpot(
-                              price.key.toDouble(), price.value!.toDouble());
-                        }
-                      })
-                      .whereType<FlSpot>()
-                      .toList()),
-              LineChartBarData(
-                  spots: priceYogya
-                      .asMap()
-                      .entries
-                      .map((price) {
-                        if (price.value != null) {
-                          return FlSpot(
-                              price.key.toDouble(), price.value!.toDouble());
-                        }
-                      })
-                      .whereType<FlSpot>()
-                      .toList())
+              getChartSpotsFromList(Colors.red, priceJateng),
+              getChartSpotsFromList(Colors.yellow, priceKlaten),
+              getChartSpotsFromList(Colors.blue, priceYogya)
             ]));
       });
     } on TimeoutException catch (_) {
