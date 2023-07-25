@@ -58,9 +58,15 @@ class _CalculatorPageState extends State<CalculatorPage> {
         'https://simponiternak.pertanian.go.id/download-harga-komoditas.php?i_laporan=1&data_tanggal_1=${DateFormat("dd-MM-yyyy").format(dateStart)}&data_tanggal_2=${DateFormat("dd-MM-yyyy").format(dateEnd)}&data_bulan_1=2012-01&data_bulan_2=${DateFormat("yyyy-MM").format(dateEnd)}&data_tahun_1=2012&data_tahun_2=${DateFormat("yyyy").format(dateEnd)}&i_komoditas=${widget.ternakId}&i_type=1&i_showcity=provkab&i_kabupaten[]=3310&i_kabupaten[]=3471&i_provinsi[]=33&i_provinsi[]=34&';
 
     // Response is in excel
-    final response = await http.post(
-      Uri.parse(apiUrl),
-    );
+    final http.Response response;
+    try {
+      response = await http.post(
+        Uri.parse(apiUrl),
+      );
+    } catch (err) {
+      throw Exception(
+          "Tidak dapat mengambil data harga, pastikan anda terhubung dengan koneksi internet");
+    }
 
     final bytes = response.bodyBytes;
     Excel excel = Excel.decodeBytes(bytes);
@@ -91,7 +97,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
         "priceDates": dates
       };
     } else {
-      throw Exception("Terjadi kesalahan, mohon coba ulang kembali nanti");
+      throw Exception(
+          "Tidak dapat mengambil data harga, pastikan anda terhubung dengan koneksi internet");
     }
   }
 
