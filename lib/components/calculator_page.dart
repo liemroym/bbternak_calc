@@ -24,14 +24,33 @@ class CalculatorPage extends StatefulWidget {
 
 class _CalculatorPageState extends State<CalculatorPage> {
   static const int priceDuration = 30;
-  List<int?> priceJateng = [], priceKlaten = [];
+  List<int?> priceJateng = [], priceYogya = [], priceKlaten = [];
   List<String?> priceDates = [];
-  int lastPriceJateng = 0, lastPriceKlaten = 0;
+  int lastPriceJateng = 0, lastPriceYogya = 0, lastPriceKlaten = 0;
   Future<Map<String, List<dynamic>?>> fetchPriceData(
       DateTime dateStart, DateTime dateEnd) async {
+    List<String?> getDataFromRow(
+        Sheet? sheet, int row, int rangeStart, int rangeEnd) {
+      return sheet?.rows[row]
+              .getRange(rangeStart, rangeEnd)
+              .map((e) => e?.value.toString())
+              .toList() ??
+          [];
+    }
+
+    List<int?> convertDateTimeStringToInt(List<String?> listOfDateTimeString) {
+      return listOfDateTimeString
+          .map((e) => (e == null
+              ? null
+              : (DateTime.parse(e).difference(DateTime(1900, 1, 1)).inDays + 2)
+                  .toString()))
+          .map((e) => e == null ? null : int.tryParse(e))
+          .toList();
+    }
+
     int dateDiff = dateEnd.difference(dateStart).inDays;
     final String apiUrl =
-        'https://simponiternak.pertanian.go.id/download-harga-komoditas.php?i_laporan=1&data_tanggal_1=${DateFormat("dd-MM-yyyy").format(dateStart)}&data_tanggal_2=${DateFormat("dd-MM-yyyy").format(dateEnd)}&data_bulan_1={2012-01}&data_bulan_2=${DateFormat("yyyy-MM").format(dateEnd)}&data_tahun_1=2012&data_tahun_2=${DateFormat("yyyy").format(dateEnd)}&i_komoditas=${widget.ternakId}&i_type=1&i_showcity=provkab&i_kabupaten[]=3310&i_provinsi[]=33&';
+        'https://simponiternak.pertanian.go.id/download-harga-komoditas.php?i_laporan=1&data_tanggal_1=${DateFormat("dd-MM-yyyy").format(dateStart)}&data_tanggal_2=${DateFormat("dd-MM-yyyy").format(dateEnd)}&data_bulan_1=2012-01&data_bulan_2=${DateFormat("yyyy-MM").format(dateEnd)}&data_tahun_1=2012&data_tahun_2=${DateFormat("yyyy").format(dateEnd)}&i_komoditas=${widget.ternakId}&i_type=1&i_showcity=provkab&i_kabupaten[]=3310&i_kabupaten[]=3471&i_provinsi[]=33&i_provinsi[]=34&';
 
     // Response is in excel
     final response = await http.post(
@@ -39,47 +58,31 @@ class _CalculatorPageState extends State<CalculatorPage> {
     );
 
     final bytes = response.bodyBytes;
-    var excel = Excel.decodeBytes(bytes);
-    var sheet = excel.tables[excel.tables.keys.first];
+    Excel excel = Excel.decodeBytes(bytes);
+    Sheet? sheet = excel.tables[excel.tables.keys.first];
 
     // Get price from excel
-    List<String?> dates = sheet?.rows[7]
-            .getRange(4, 4 + dateDiff)
-            .map((e) => e?.value.toString())
-            .toList() ??
-        [];
-    List<String?> pricesJateng = sheet?.rows[9]
-            .getRange(4, 4 + dateDiff)
-            .map((e) => e?.value.toString())
-            .toList() ??
-        [];
-    List<String?> pricesKlaten = sheet?.rows[10]
-            .getRange(4, 4 + dateDiff)
-            .map((e) => e?.value.toString())
-            .toList() ??
-        [];
+    List<String?> dates = getDataFromRow(sheet, 7, 4, 4 + dateDiff);
+    List<String?> pricesJatengDateTime =
+        getDataFromRow(sheet, 9, 4, 4 + dateDiff);
+    List<String?> pricesKlatenDateTime =
+        getDataFromRow(sheet, 10, 4, 4 + dateDiff);
+    List<String?> pricesYogyaDateTime =
+        getDataFromRow(sheet, 11, 4, 4 + dateDiff);
 
     // Excel converted price is in ISO DateTime and needs to be converted to integer
-    List<int?> pricesJatengConverted = pricesJateng
-        .map((e) => (e == null
-            ? null
-            : (DateTime.parse(e).difference(DateTime(1900, 1, 1)).inDays + 2)
-                .toString()))
-        .map((e) => e == null ? null : int.tryParse(e))
-        .toList();
-
-    List<int?> pricesKlatenConverted = pricesKlaten
-        .map((e) => (e == null
-            ? null
-            : (DateTime.parse(e).difference(DateTime(1900, 1, 1)).inDays + 2)
-                .toString()))
-        .map((e) => e == null ? null : int.tryParse(e))
-        .toList();
+    List<int?> pricesJatengConverted =
+        convertDateTimeStringToInt(pricesJatengDateTime);
+    List<int?> pricesKlatenConverted =
+        convertDateTimeStringToInt(pricesKlatenDateTime);
+    List<int?> pricesYogyaConverted =
+        convertDateTimeStringToInt(pricesYogyaDateTime);
 
     if (response.statusCode == 200) {
       return {
         "priceJateng": pricesJatengConverted,
         "priceKlaten": pricesKlatenConverted,
+        "priceYogya": pricesYogyaConverted,
         "priceDates": dates
       };
     } else {
@@ -100,11 +103,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
               DateTime.now().subtract(const Duration(days: priceDuration)),
               DateTime.now())
           // Add timeout for 5 second
-          .timeout(Duration(seconds: 5))
+          .timeout(Duration(seconds: 10))
           .then((value) => {
                 setState(() {
                   priceJateng = value["priceJateng"]!.cast<int?>();
                   priceKlaten = value["priceKlaten"]!.cast<int?>();
+                  priceYogya = value["priceYogya"]!.cast<int?>();
                   priceDates = value["priceDates"]!.cast<String?>();
                 })
               })
@@ -113,18 +117,17 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     priceJateng.whereType<int>().toList();
                 List<int>? priceKlatenFiltered =
                     priceKlaten.whereType<int>().toList();
+                List<int>? priceYogyaFiltered =
+                    priceYogya.whereType<int>().toList();
 
-                if (priceJatengFiltered.isNotEmpty) {
-                  lastPriceJateng = priceJatengFiltered.last;
-                } else {
-                  lastPriceJateng = 0;
-                }
-
-                if (priceKlatenFiltered.isNotEmpty) {
-                  lastPriceKlaten = priceKlatenFiltered.last;
-                } else {
-                  lastPriceKlaten = 0;
-                }
+                lastPriceJateng = priceJatengFiltered.isNotEmpty
+                    ? priceJatengFiltered.last
+                    : 0;
+                lastPriceKlaten = priceKlatenFiltered.isNotEmpty
+                    ? priceKlatenFiltered.last
+                    : 0;
+                lastPriceYogya =
+                    priceYogyaFiltered.isNotEmpty ? priceYogyaFiltered.last : 0;
               }))));
     } on TimeoutException catch (_) {
       // Handle timeout
@@ -201,7 +204,20 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       .toList(),
                 ),
                 LineChartBarData(
+                    color: Colors.yellow,
                     spots: priceKlaten
+                        .asMap()
+                        .entries
+                        .map((price) {
+                          if (price.value != null) {
+                            return FlSpot(
+                                price.key.toDouble(), price.value!.toDouble());
+                          }
+                        })
+                        .whereType<FlSpot>()
+                        .toList()),
+                LineChartBarData(
+                    spots: priceYogya
                         .asMap()
                         .entries
                         .map((price) {
@@ -219,9 +235,14 @@ class _CalculatorPageState extends State<CalculatorPage> {
           child: Row(
             children: [
               Spacer(),
-              Text("Harga Jateng: ${lastPriceJateng.toString()}"),
+              Text(
+                  "Harga Jawa Tengah:\nRp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}"),
               Spacer(),
-              Text("Harga Klaten: ${lastPriceKlaten.toString()}"),
+              Text(
+                  "Harga Yogyakarta:\nRp. ${NumberFormat('#,##0.00').format(lastPriceYogya)}"),
+              Spacer(),
+              Text(
+                  "Harga Klaten:\nRp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}"),
               Spacer(),
             ],
           ),
@@ -234,6 +255,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   sharedControllers: e["sharedControllers"],
                   prices: {
                     "priceJateng": lastPriceJateng,
+                    "priceYogya": lastPriceYogya,
                     "priceKlaten": lastPriceKlaten
                   },
                 ))

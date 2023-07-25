@@ -29,7 +29,10 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  String weight = "0 kg", priceJateng = "Rp. 0", priceKlaten = "Rp. 0";
+  String weight = "0 kg",
+      priceJateng = "Rp. 0",
+      priceKlaten = "Rp. 0",
+      priceYogya = "Rp. 0";
 
   Map<String, TextEditingController> _controllers = {};
 
@@ -51,16 +54,18 @@ class _CalculatorState extends State<Calculator> {
 
   void _onTextChanged() {
     num weightCalc = widget.calcFunc(_controllers);
-    num? priceJatengCalc, priceKlatenCalc;
+    num? priceJatengCalc, priceKlatenCalc, priceYogyaCalc;
     if (widget.prices != null) {
       priceJatengCalc = widget.prices!["priceJateng"]! * weightCalc;
       priceKlatenCalc = widget.prices!["priceKlaten"]! * weightCalc;
+      priceYogyaCalc = widget.prices!["priceYogya"]! * weightCalc;
     }
 
     setState(() {
       weight = "${NumberFormat('#,##0.00').format(weightCalc)} kg";
       priceJateng = "Rp. ${NumberFormat('#,##0.00').format(priceJatengCalc)}";
       priceKlaten = "Rp. ${NumberFormat('#,##0.00').format(priceKlatenCalc)}";
+      priceYogya = "Rp. ${NumberFormat('#,##0.00').format(priceYogyaCalc)}";
     });
   }
 
@@ -72,42 +77,50 @@ class _CalculatorState extends State<Calculator> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return ExpansionTile(title: Text(widget.title), children: [
-      Form(
-        child: Row(
-            children: widget.inputs.entries
-                .map((input) => Expanded(
-                    child: Padding(
-                        padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
-                        child: TextFormField(
-                          decoration: InputDecoration(label: Text(input.value)),
-                          controller: _controllers[input.key],
-                          onChanged: (value) {
-                            _onTextChanged();
-                          },
-                          keyboardType: TextInputType.number,
-                        ))))
-                .toList()),
-      ),
-      Container(
-          margin: EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              const Spacer(),
-              Text(
-                weight,
-              ),
-              const Spacer(),
-              Text(
-                priceJateng,
-              ),
-              const Spacer(),
-              Text(
-                priceKlaten,
-              ),
-              const Spacer(),
-            ],
-          ))
-    ]);
+    return ExpansionTile(
+        title: Text(widget.title),
+        initiallyExpanded: true,
+        children: [
+          Form(
+            child: Row(
+                children: widget.inputs.entries
+                    .map((input) => Expanded(
+                        child: Padding(
+                            padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
+                            child: TextFormField(
+                              decoration:
+                                  InputDecoration(label: Text(input.value)),
+                              controller: _controllers[input.key],
+                              onChanged: (value) {
+                                _onTextChanged();
+                              },
+                              keyboardType: TextInputType.number,
+                            ))))
+                    .toList()),
+          ),
+          Container(
+              margin: EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  const Spacer(),
+                  Text(
+                    weight,
+                  ),
+                  const Spacer(),
+                  Text(
+                    priceJateng,
+                  ),
+                  const Spacer(),
+                  Text(
+                    priceKlaten,
+                  ),
+                  const Spacer(),
+                  Text(
+                    priceYogya,
+                  ),
+                  const Spacer(),
+                ],
+              ))
+        ]);
   }
 }
