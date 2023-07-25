@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:excel/excel.dart';
 import 'package:intl/intl.dart';
 import 'package:kalkulator_bbternak/components/calculator.dart';
+import 'package:kalkulator_bbternak/components/custom_text_box.dart';
 import 'package:kalkulator_bbternak/components/error_screen.dart';
 import 'package:kalkulator_bbternak/components/loading_screen.dart';
 
@@ -128,9 +129,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
       LineChartBarData getChartSpotsFromList(Color color, List<int?> data) {
         return LineChartBarData(
           isCurved: true,
-          barWidth: 5,
+          barWidth: 2,
           isStrokeCapRound: true,
           color: color,
+          dotData: FlDotData(
+            show: false,
+          ),
           spots: data
               .asMap()
               .entries
@@ -259,14 +263,21 @@ class _CalculatorPageState extends State<CalculatorPage> {
           child: Row(
             children: [
               Spacer(),
-              Text(
-                  "Harga Jawa Tengah:\nRp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}"),
+              CustomTextBox(
+                  color: Colors.red,
+                  text:
+                      "Harga Jawa Tengah:\nRp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}"),
               Spacer(),
-              Text(
-                  "Harga Yogyakarta:\nRp. ${NumberFormat('#,##0.00').format(lastPriceYogya)}"),
+              CustomTextBox(
+                  color: Colors.yellow,
+                  text:
+                      "Harga Klaten:\nRp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}"),
+              CustomTextBox(
+                color: Colors.blue,
+                text:
+                    "Harga Yogyakarta:\nRp. ${NumberFormat('#,##0.00').format(lastPriceYogya)}",
+              ),
               Spacer(),
-              Text(
-                  "Harga Klaten:\nRp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}"),
               Spacer(),
             ],
           ),

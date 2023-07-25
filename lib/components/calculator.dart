@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kalkulator_bbternak/components/custom_text_box.dart';
 
 class Calculator extends StatefulWidget {
   const Calculator({
@@ -103,20 +104,24 @@ class _CalculatorState extends State<Calculator> {
               child: Row(
                 children: [
                   const Spacer(),
-                  Text(
-                    weight,
+                  CustomTextBox(
+                    color: Colors.green,
+                    text: "Berat badan:\n$weight",
                   ),
                   const Spacer(),
-                  Text(
-                    priceJateng,
+                  CustomTextBox(
+                    color: Colors.red,
+                    text: "Harga Jawa Tengah:\n$priceJateng",
                   ),
                   const Spacer(),
-                  Text(
-                    priceKlaten,
+                  CustomTextBox(
+                    color: Colors.yellow,
+                    text: "Harga Klaten:\n$priceKlaten",
                   ),
                   const Spacer(),
-                  Text(
-                    priceYogya,
+                  CustomTextBox(
+                    color: Colors.blue,
+                    text: "Harga Yogya:\n$priceYogya",
                   ),
                   const Spacer(),
                 ],
