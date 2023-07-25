@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:excel/excel.dart';
 import 'package:intl/intl.dart';
 import 'package:kalkulator_bbternak/components/calculator.dart';
+import 'package:kalkulator_bbternak/components/error_screen.dart';
+import 'package:kalkulator_bbternak/components/loading_screen.dart';
 
 class CalculatorPage extends StatefulWidget {
   const CalculatorPage(
@@ -27,6 +29,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
   List<int?> priceJateng = [], priceYogya = [], priceKlaten = [];
   List<String?> priceDates = [];
   int lastPriceJateng = 0, lastPriceYogya = 0, lastPriceKlaten = 0;
+
+  Widget priceChart = LoadingScreen();
+
   Future<Map<String, List<dynamic>?>> fetchPriceData(
       DateTime dateStart, DateTime dateEnd) async {
     List<String?> getDataFromRow(
@@ -86,7 +91,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
         "priceDates": dates
       };
     } else {
-      throw Exception('Error bang');
+      throw Exception("Terjadi kesalahan, mohon coba ulang kembali nanti");
     }
   }
 
@@ -99,41 +104,114 @@ class _CalculatorPageState extends State<CalculatorPage> {
   void initPrice() async {
     try {
       // Fetch past  days data from government website
-      fetchPriceData(
+      Map<String, List<dynamic>?> value = await fetchPriceData(
               DateTime.now().subtract(const Duration(days: priceDuration)),
               DateTime.now())
-          // Add timeout for 5 second
-          .timeout(Duration(seconds: 10))
-          .then((value) => {
-                setState(() {
-                  priceJateng = value["priceJateng"]!.cast<int?>();
-                  priceKlaten = value["priceKlaten"]!.cast<int?>();
-                  priceYogya = value["priceYogya"]!.cast<int?>();
-                  priceDates = value["priceDates"]!.cast<String?>();
-                })
-              })
-          .then(((value) => setState((() {
-                List<int>? priceJatengFiltered =
-                    priceJateng.whereType<int>().toList();
-                List<int>? priceKlatenFiltered =
-                    priceKlaten.whereType<int>().toList();
-                List<int>? priceYogyaFiltered =
-                    priceYogya.whereType<int>().toList();
+          .timeout(Duration(seconds: 10));
 
-                lastPriceJateng = priceJatengFiltered.isNotEmpty
-                    ? priceJatengFiltered.last
-                    : 0;
-                lastPriceKlaten = priceKlatenFiltered.isNotEmpty
-                    ? priceKlatenFiltered.last
-                    : 0;
-                lastPriceYogya =
-                    priceYogyaFiltered.isNotEmpty ? priceYogyaFiltered.last : 0;
-              }))));
+      // Add timeout for 5 second
+      setState(() {
+        priceJateng = value["priceJateng"]!.cast<int?>();
+        priceKlaten = value["priceKlaten"]!.cast<int?>();
+        priceYogya = value["priceYogya"]!.cast<int?>();
+        priceDates = value["priceDates"]!.cast<String?>();
+
+        List<int>? priceJatengFiltered = priceJateng.whereType<int>().toList();
+        List<int>? priceKlatenFiltered = priceKlaten.whereType<int>().toList();
+        List<int>? priceYogyaFiltered = priceYogya.whereType<int>().toList();
+
+        lastPriceJateng =
+            priceJatengFiltered.isNotEmpty ? priceJatengFiltered.last : 0;
+        lastPriceKlaten =
+            priceKlatenFiltered.isNotEmpty ? priceKlatenFiltered.last : 0;
+        lastPriceYogya =
+            priceYogyaFiltered.isNotEmpty ? priceYogyaFiltered.last : 0;
+        priceChart = LineChart(LineChartData(
+            minX: 0,
+            maxX: priceDuration.toDouble(),
+            minY: 0,
+            maxY: 100000,
+            titlesData: FlTitlesData(
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles:
+                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: priceDuration / 6,
+                      getTitlesWidget: (value, meta) {
+                        if (priceDates != null) {
+                          var date = value.toInt() < priceDates.length
+                              ? priceDates[value.toInt()]
+                              : "";
+
+                          return Transform.rotate(
+                              angle: -0.2,
+                              child: SideTitleWidget(
+                                  axisSide: meta.axisSide,
+                                  child: Text(
+                                    "$date",
+                                    style: TextStyle(fontSize: 10),
+                                  )));
+                        } else {
+                          return SideTitleWidget(
+                              child: Text(""), axisSide: meta.axisSide);
+                        }
+                      })),
+            ),
+            lineBarsData: [
+              LineChartBarData(
+                color: Colors.red,
+                spots: priceJateng
+                    .asMap()
+                    .entries
+                    .map((price) {
+                      if (price.value != null) {
+                        return FlSpot(
+                            price.key.toDouble(), price.value!.toDouble());
+                      }
+                    })
+                    .whereType<FlSpot>()
+                    .toList(),
+              ),
+              LineChartBarData(
+                  color: Colors.yellow,
+                  spots: priceKlaten
+                      .asMap()
+                      .entries
+                      .map((price) {
+                        if (price.value != null) {
+                          return FlSpot(
+                              price.key.toDouble(), price.value!.toDouble());
+                        }
+                      })
+                      .whereType<FlSpot>()
+                      .toList()),
+              LineChartBarData(
+                  spots: priceYogya
+                      .asMap()
+                      .entries
+                      .map((price) {
+                        if (price.value != null) {
+                          return FlSpot(
+                              price.key.toDouble(), price.value!.toDouble());
+                        }
+                      })
+                      .whereType<FlSpot>()
+                      .toList())
+            ]));
+      });
     } on TimeoutException catch (_) {
-      // Handle timeout
-      print("Timeout bang");
+      setState(() {
+        priceChart = const ErrorScreen(
+            message:
+                "Tidak dapat mengambil data harga, pastikan anda terhubung dengan koneksi internet");
+      });
     } catch (err) {
-      print("error");
+      // Handle error
+      setState(() {
+        priceChart = ErrorScreen(message: err.toString().substring(11));
+      });
     }
   }
 
@@ -151,85 +229,10 @@ class _CalculatorPageState extends State<CalculatorPage> {
       ),
       body: ListView(children: [
         Container(
-          width: 50,
-          height: 200,
-          margin: EdgeInsets.all(20),
-          child: LineChart(LineChartData(
-              minX: 0,
-              maxX: priceDuration.toDouble(),
-              minY: 0,
-              maxY: 100000,
-              titlesData: FlTitlesData(
-                topTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: priceDuration / 6,
-                        getTitlesWidget: (value, meta) {
-                          if (priceDates != null) {
-                            var date = value.toInt() < priceDates.length
-                                ? priceDates[value.toInt()]
-                                : "";
-
-                            return Transform.rotate(
-                                angle: -0.2,
-                                child: SideTitleWidget(
-                                    axisSide: meta.axisSide,
-                                    child: Text(
-                                      "$date",
-                                      style: TextStyle(fontSize: 10),
-                                    )));
-                          } else {
-                            return SideTitleWidget(
-                                child: Text(""), axisSide: meta.axisSide);
-                          }
-                        })),
-              ),
-              lineBarsData: [
-                LineChartBarData(
-                  color: Colors.red,
-                  spots: priceJateng
-                      .asMap()
-                      .entries
-                      .map((price) {
-                        if (price.value != null) {
-                          return FlSpot(
-                              price.key.toDouble(), price.value!.toDouble());
-                        }
-                      })
-                      .whereType<FlSpot>()
-                      .toList(),
-                ),
-                LineChartBarData(
-                    color: Colors.yellow,
-                    spots: priceKlaten
-                        .asMap()
-                        .entries
-                        .map((price) {
-                          if (price.value != null) {
-                            return FlSpot(
-                                price.key.toDouble(), price.value!.toDouble());
-                          }
-                        })
-                        .whereType<FlSpot>()
-                        .toList()),
-                LineChartBarData(
-                    spots: priceYogya
-                        .asMap()
-                        .entries
-                        .map((price) {
-                          if (price.value != null) {
-                            return FlSpot(
-                                price.key.toDouble(), price.value!.toDouble());
-                          }
-                        })
-                        .whereType<FlSpot>()
-                        .toList())
-              ])),
-        ),
+            width: 50,
+            height: 200,
+            margin: EdgeInsets.all(20),
+            child: priceChart),
         Container(
           margin: EdgeInsets.all(20),
           child: Row(
