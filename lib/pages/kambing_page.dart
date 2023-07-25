@@ -19,60 +19,44 @@ class _KambingPageState extends State<KambingPage> {
 
   @override
   Widget build(BuildContext context) {
-    num schoorl(Map<String, TextEditingController> controllers) {
+    num ardjodarmoko(Map<String, TextEditingController> controllers) {
       num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
-      return pow(lingkarDada + 22, 2) / 100;
+      num panjangBadan = num.parse(controllers["panjangBadanCm"]!.text);
+      return pow(lingkarDada, 2) * panjangBadan / 10000;
     }
 
-    num winter(Map<String, TextEditingController> controllers) {
+    num scheifferLambourne(Map<String, TextEditingController> controllers) {
       num lingkarDadaInch =
           num.parse(controllers["lingkarDadaCm"]!.text) / 2.54;
       num panjangBadanInch =
           num.parse(controllers["panjangBadanCm"]!.text) / 2.54;
 
-      return pow(lingkarDadaInch, 2) * panjangBadanInch / 300;
-    }
-
-    num smith(Map<String, TextEditingController> controllers) {
-      num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
-      return pow(lingkarDada + 18, 2) / 100;
-    }
-
-    num pedagingKejobongJantan(Map<String, TextEditingController> controllers) {
-      num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
-      return pow(lingkarDada - 15, 2) / 100;
+      num bbPounds = pow(lingkarDadaInch, 2) * panjangBadanInch / 300;
+      return bbPounds * 0.453592;
     }
 
     Map<String, TextEditingController> sharedControllers = {
-      "lingkarDadaCm": TextEditingController()
+      "lingkarDadaCm": TextEditingController(),
+      "panjangBadanCm": TextEditingController()
     };
 
     List<Map<String, dynamic>> calcData = [
       {
-        "title": "Schoorl",
-        "inputs": {"lingkarDadaCm": "Lingkar Dada (cm)"},
-        "calcFunc": schoorl,
-        "sharedControllers": sharedControllers,
-      },
-      {
-        "title": "Winter",
+        "title": "Ardjodarmoko",
         "inputs": {
           "lingkarDadaCm": "Lingkar Dada (cm)",
           "panjangBadanCm": "Panjang Badan (cm)"
         },
-        "calcFunc": winter,
+        "calcFunc": ardjodarmoko,
         "sharedControllers": sharedControllers,
       },
       {
-        "title": "Smith",
-        "inputs": {"lingkarDadaCm": "Lingkar Dada (cm)"},
-        "calcFunc": smith,
-        "sharedControllers": sharedControllers,
-      },
-      {
-        "title": "Pedaging Kejobong Jantan",
-        "inputs": {"lingkarDadaCm": "Lingkar Dada (cm)"},
-        "calcFunc": pedagingKejobongJantan,
+        "title": "Scheiffer-Lambourne",
+        "inputs": {
+          "lingkarDadaCm": "Lingkar Dada (cm)",
+          "panjangBadanCm": "Panjang Badan (cm)"
+        },
+        "calcFunc": scheifferLambourne,
         "sharedControllers": sharedControllers,
       },
     ];

@@ -18,13 +18,6 @@ class _SapiPageState extends State<SapiPage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-
     num schoorl(Map<String, TextEditingController> controllers) {
       num lingkarDada = num.parse(controllers["lingkarDadaCm"]!.text);
       return pow(lingkarDada + 22, 2) / 100;
@@ -36,7 +29,8 @@ class _SapiPageState extends State<SapiPage> {
       num panjangBadanInch =
           num.parse(controllers["panjangBadanCm"]!.text) / 2.54;
 
-      return pow(lingkarDadaInch, 2) * panjangBadanInch / 300;
+      num bbPounds = pow(lingkarDadaInch, 2) * panjangBadanInch / 300;
+      return bbPounds * 0.453592;
     }
 
     num smith(Map<String, TextEditingController> controllers) {
