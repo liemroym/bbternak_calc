@@ -51,7 +51,12 @@ class _HomePageState extends State<HomePage> {
                         child: Image.asset("assets/images/sapi.png",
                             fit: BoxFit.cover),
                       ),
-                      Text("Sapi")
+                      Text(
+                        "Sapi",
+                        style: TextStyle(
+                            fontSize:
+                                MediaQuery.of(context).textScaleFactor * 18),
+                      )
                     ]),
                 onPressed: () {
                   Navigator.pushNamed(context, '/sapi');
@@ -74,7 +79,12 @@ class _HomePageState extends State<HomePage> {
                         child: Image.asset("assets/images/kambing.png",
                             fit: BoxFit.cover),
                       ),
-                      Text("Kambing")
+                      Text(
+                        "Kambing",
+                        style: TextStyle(
+                            fontSize:
+                                MediaQuery.of(context).textScaleFactor * 18),
+                      )
                     ]),
                 onPressed: () {
                   Navigator.pushNamed(context, '/kambing');

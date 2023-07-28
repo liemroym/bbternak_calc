@@ -19,23 +19,28 @@ class CustomTextBox extends StatelessWidget {
             : Colors.white;
 
     return Container(
-        color: color,
+        margin: EdgeInsets.only(left: 10, right: 10),
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+          color: color,
+        ),
         child: Column(children: [
           Text(
             title,
             style: TextStyle(
                 fontWeight: FontWeight.w100,
                 color: textColor,
-                fontSize: MediaQuery.of(context).textScaleFactor * 10),
-            textAlign: TextAlign.center,
+                fontSize: MediaQuery.of(context).textScaleFactor * 14),
+            textAlign: TextAlign.left,
           ),
           Text(
             value,
             style: TextStyle(
                 color: textColor,
                 fontWeight: FontWeight.bold,
-                fontSize: MediaQuery.of(context).textScaleFactor * 20),
-            textAlign: TextAlign.center,
+                fontSize: MediaQuery.of(context).textScaleFactor * 18),
+            textAlign: TextAlign.left,
           )
         ]));
   }

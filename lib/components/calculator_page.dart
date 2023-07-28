@@ -251,32 +251,36 @@ class _CalculatorPageState extends State<CalculatorPage> {
       body: ListView(children: [
         Container(
             width: 50,
-            height: 200,
+            height: MediaQuery.of(context).textScaleFactor * 200,
             margin: EdgeInsets.all(20),
             child: priceChart),
         Container(
+          alignment: Alignment.center,
           margin: EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Spacer(),
-              CustomTextBox(
-                  color: Colors.red,
-                  title: "Harga Jawa Tengah:",
-                  value:
-                      "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}"),
-              Spacer(),
-              CustomTextBox(
-                  color: Colors.yellow,
-                  title: "Harga Klaten:",
-                  value:
-                      "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}"),
-              // CustomTextBox(
-              //   color: Colors.blue,
-              //   title:
-              //       "Harga Yogyakarta:\nRp. ${NumberFormat('#,##0.00').format(lastPriceYogya)}"                  value: )
-              // ),,
-              Spacer(),
-            ],
+          child: SingleChildScrollView(
+            child: Row(
+              children: [
+                // Spacer(),
+                CustomTextBox(
+                    color: Colors.red,
+                    title: "Harga Jawa Tengah:",
+                    value:
+                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}"),
+                // Spacer(),
+                CustomTextBox(
+                    color: Colors.yellow,
+                    title: "Harga Klaten:",
+                    value:
+                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}"),
+                // CustomTextBox(
+                //   color: Colors.blue,
+                //   title:
+                //       "Harga Yogyakarta:\nRp. ${NumberFormat('#,##0.00').format(lastPriceYogya)}"                  value: )
+                // ),,
+                // Spacer(),
+              ],
+            ),
+            scrollDirection: Axis.horizontal,
           ),
         ),
         ...widget.calcData

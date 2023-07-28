@@ -11,14 +11,7 @@ class Calculator extends StatefulWidget {
     this.prices,
     this.sharedControllers,
   });
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object x(defined below) that contains fields that affect
-  // how it looks.
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
   final String title;
   final Map<String, String> inputs; // {id: label}
   final Function calcFunc;
@@ -80,50 +73,47 @@ class _CalculatorState extends State<Calculator> {
         title: Text(widget.title),
         initiallyExpanded: true,
         children: [
-          Form(
-            child: Row(
-                children: widget.inputs.entries
-                    .map((input) => Expanded(
-                        child: Padding(
-                            padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
-                            child: TextFormField(
-                              decoration:
-                                  InputDecoration(label: Text(input.value)),
-                              controller: _controllers[input.key],
-                              onChanged: (value) {
-                                _onTextChanged();
-                              },
-                              keyboardType: TextInputType.number,
-                            ))))
-                    .toList()),
-          ),
+          Row(
+              children: widget.inputs.entries
+                  .map((input) => Expanded(
+                      child: Padding(
+                          padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
+                          child: TextField(
+                            decoration:
+                                InputDecoration(label: Text(input.value)),
+                            controller: _controllers[input.key],
+                            onChanged: (value) {
+                              _onTextChanged();
+                            },
+                            keyboardType: TextInputType.number,
+                          ))))
+                  .toList()),
           Container(
               margin: EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  const Spacer(),
-                  CustomTextBox(
-                      color: Colors.green,
-                      title: "Berat badan:",
-                      value: weight),
-                  const Spacer(),
-                  CustomTextBox(
-                      color: Colors.red,
-                      title: "Harga Jawa Tengah:",
-                      value: priceJateng),
-                  const Spacer(),
-                  CustomTextBox(
-                      color: Colors.yellow,
-                      title: "Harga Klaten:",
-                      value: priceKlaten),
-                  const Spacer(),
-                  // CustomTextBox(
-                  //   color: Colors.blue,
-                  //   text: "Harga Yogya:\n$priceYogya",
-                  // ),
-                  // const Spacer(),
-                ],
-              ))
+              child: SingleChildScrollView(
+                child: Row(
+                  children: [
+                    CustomTextBox(
+                        color: Colors.green,
+                        title: "Berat badan:",
+                        value: weight),
+                    CustomTextBox(
+                        color: Colors.red,
+                        title: "Harga Jawa Tengah:",
+                        value: priceJateng),
+                    CustomTextBox(
+                        color: Colors.yellow,
+                        title: "Harga Klaten:",
+                        value: priceKlaten),
+                    // CustomTextBox(
+                    //   color: Colors.blue,
+                    //   text: "Harga Yogya:\n$priceYogya",
+                    // ),
+                    // const Spacer(),
+                  ],
+                ),
+                scrollDirection: Axis.horizontal,
+              )),
         ]);
   }
 }
