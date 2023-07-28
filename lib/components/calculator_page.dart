@@ -149,21 +149,21 @@ class _CalculatorPageState extends State<CalculatorPage> {
       }
 
       setState(() {
+        priceDates = value["priceDates"]!.cast<String?>();
         priceJateng = value["priceJateng"]!.cast<int?>();
         priceKlaten = value["priceKlaten"]!.cast<int?>();
-        priceYogya = value["priceYogya"]!.cast<int?>();
-        priceDates = value["priceDates"]!.cast<String?>();
+        // priceYogya = value["priceYogya"]!.cast<int?>();
 
         List<int>? priceJatengFiltered = priceJateng.whereType<int>().toList();
         List<int>? priceKlatenFiltered = priceKlaten.whereType<int>().toList();
-        List<int>? priceYogyaFiltered = priceYogya.whereType<int>().toList();
+        // List<int>? priceYogyaFiltered = priceYogya.whereType<int>().toList();
 
         lastPriceJateng =
             priceJatengFiltered.isNotEmpty ? priceJatengFiltered.last : 0;
         lastPriceKlaten =
             priceKlatenFiltered.isNotEmpty ? priceKlatenFiltered.last : 0;
-        lastPriceYogya =
-            priceYogyaFiltered.isNotEmpty ? priceYogyaFiltered.last : 0;
+        // lastPriceYogya =
+        //     priceYogyaFiltered.isNotEmpty ? priceYogyaFiltered.last : 0;
 
         priceChart = LineChart(LineChartData(
             minX: 0,
@@ -187,10 +187,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   strokeWidth: 1,
                 );
               },
-            ),
-            borderData: FlBorderData(
-              show: true,
-              border: Border.all(color: const Color(0xff37434d)),
             ),
             titlesData: FlTitlesData(
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -223,7 +219,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
             lineBarsData: [
               getChartSpotsFromList(Colors.red, priceJateng),
               getChartSpotsFromList(Colors.yellow, priceKlaten),
-              getChartSpotsFromList(Colors.blue, priceYogya)
+              // getChartSpotsFromList(Colors.blue, priceYogya)
             ]));
       });
     } on TimeoutException catch (_) {
@@ -265,19 +261,20 @@ class _CalculatorPageState extends State<CalculatorPage> {
               Spacer(),
               CustomTextBox(
                   color: Colors.red,
-                  text:
-                      "Harga Jawa Tengah:\nRp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}"),
+                  title: "Harga Jawa Tengah:",
+                  value:
+                      "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}"),
               Spacer(),
               CustomTextBox(
                   color: Colors.yellow,
-                  text:
-                      "Harga Klaten:\nRp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}"),
-              CustomTextBox(
-                color: Colors.blue,
-                text:
-                    "Harga Yogyakarta:\nRp. ${NumberFormat('#,##0.00').format(lastPriceYogya)}",
-              ),
-              Spacer(),
+                  title: "Harga Klaten:",
+                  value:
+                      "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}"),
+              // CustomTextBox(
+              //   color: Colors.blue,
+              //   title:
+              //       "Harga Yogyakarta:\nRp. ${NumberFormat('#,##0.00').format(lastPriceYogya)}"                  value: )
+              // ),,
               Spacer(),
             ],
           ),
@@ -290,8 +287,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   sharedControllers: e["sharedControllers"],
                   prices: {
                     "priceJateng": lastPriceJateng,
-                    "priceYogya": lastPriceYogya,
                     "priceKlaten": lastPriceKlaten
+                    // "priceYogya": lastPriceYogya,
                   },
                 ))
             .toList()

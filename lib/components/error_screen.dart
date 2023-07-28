@@ -7,7 +7,8 @@ class ErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Expanded(
+        child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -16,11 +17,11 @@ class ErrorScreen extends StatelessWidget {
           child: Image.asset("assets/images/error.png", fit: BoxFit.cover),
         ),
         Spacer(),
-        Text(
-          message,
-          textAlign: TextAlign.center,
-        )
+        Text(message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: MediaQuery.of(context).textScaleFactor * 10))
       ],
-    );
+    ));
   }
 }

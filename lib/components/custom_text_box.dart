@@ -2,27 +2,41 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextBox extends StatelessWidget {
-  const CustomTextBox({super.key, required this.color, required this.text});
+  const CustomTextBox(
+      {super.key,
+      required this.color,
+      required this.title,
+      required this.value});
 
   final Color color;
-  final String text;
+  final String title, value;
 
   @override
   Widget build(BuildContext context) {
+    final Color textColor =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.light
+            ? Colors.black
+            : Colors.white;
+
     return Container(
-        padding: EdgeInsets.fromLTRB(12.0, 4.0, 12.0, 4.0),
-        decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.all(Radius.circular(15.0))),
-        child: Text(
-          text,
-          style: TextStyle(
-            color:
-                ThemeData.estimateBrightnessForColor(color) == Brightness.light
-                    ? Colors.black
-                    : Colors.white,
+        color: color,
+        child: Column(children: [
+          Text(
+            title,
+            style: TextStyle(
+                fontWeight: FontWeight.w100,
+                color: textColor,
+                fontSize: MediaQuery.of(context).textScaleFactor * 10),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ));
+          Text(
+            value,
+            style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: MediaQuery.of(context).textScaleFactor * 20),
+            textAlign: TextAlign.center,
+          )
+        ]));
   }
 }

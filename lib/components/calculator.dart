@@ -30,10 +30,8 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  String weight = "0 kg",
-      priceJateng = "Rp. 0",
-      priceKlaten = "Rp. 0",
-      priceYogya = "Rp. 0";
+  String weight = "0 kg", priceJateng = "Rp. 0", priceKlaten = "Rp. 0";
+  // priceYogya = "Rp. 0";
 
   Map<String, TextEditingController> _controllers = {};
 
@@ -59,14 +57,14 @@ class _CalculatorState extends State<Calculator> {
     if (widget.prices != null) {
       priceJatengCalc = widget.prices!["priceJateng"]! * weightCalc;
       priceKlatenCalc = widget.prices!["priceKlaten"]! * weightCalc;
-      priceYogyaCalc = widget.prices!["priceYogya"]! * weightCalc;
+      // priceYogyaCalc = widget.prices!["priceYogya"]! * weightCalc;
     }
 
     setState(() {
       weight = "${NumberFormat('#,##0.00').format(weightCalc)} kg";
       priceJateng = "Rp. ${NumberFormat('#,##0.00').format(priceJatengCalc)}";
       priceKlaten = "Rp. ${NumberFormat('#,##0.00').format(priceKlatenCalc)}";
-      priceYogya = "Rp. ${NumberFormat('#,##0.00').format(priceYogyaCalc)}";
+      // priceYogya = "Rp. ${NumberFormat('#,##0.00').format(priceYogyaCalc)}";
     });
   }
 
@@ -105,25 +103,25 @@ class _CalculatorState extends State<Calculator> {
                 children: [
                   const Spacer(),
                   CustomTextBox(
-                    color: Colors.green,
-                    text: "Berat badan:\n$weight",
-                  ),
+                      color: Colors.green,
+                      title: "Berat badan:",
+                      value: weight),
                   const Spacer(),
                   CustomTextBox(
-                    color: Colors.red,
-                    text: "Harga Jawa Tengah:\n$priceJateng",
-                  ),
+                      color: Colors.red,
+                      title: "Harga Jawa Tengah:",
+                      value: priceJateng),
                   const Spacer(),
                   CustomTextBox(
-                    color: Colors.yellow,
-                    text: "Harga Klaten:\n$priceKlaten",
-                  ),
+                      color: Colors.yellow,
+                      title: "Harga Klaten:",
+                      value: priceKlaten),
                   const Spacer(),
-                  CustomTextBox(
-                    color: Colors.blue,
-                    text: "Harga Yogya:\n$priceYogya",
-                  ),
-                  const Spacer(),
+                  // CustomTextBox(
+                  //   color: Colors.blue,
+                  //   text: "Harga Yogya:\n$priceYogya",
+                  // ),
+                  // const Spacer(),
                 ],
               ))
         ]);
