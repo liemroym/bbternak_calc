@@ -26,27 +26,28 @@ class _CalculatorState extends State<Calculator> {
   String weight = "0 kg", priceJateng = "Rp. 0", priceKlaten = "Rp. 0";
   // priceYogya = "Rp. 0";
 
-  Map<String, TextEditingController> _controllers = {};
+  Map<String, TextEditingController> controllers = {};
 
   @override
   void initState() {
     super.initState();
-    _controllers = {
+    controllers = {
       for (var input in widget.inputs.entries)
         input.key: TextEditingController()
     };
 
     if (widget.sharedControllers != null) {
       for (var controller in widget.sharedControllers!.entries) {
-        controller.value.addListener(_onTextChanged);
-        _controllers[controller.key] = controller.value;
+        controller.value.addListener(onTextChanged);
+        controllers[controller.key] = controller.value;
       }
     }
   }
 
-  void _onTextChanged() {
-    num weightCalc = widget.calcFunc(_controllers);
+  void onTextChanged() {
+    num weightCalc = widget.calcFunc(controllers);
     num? priceJatengCalc, priceKlatenCalc, priceYogyaCalc;
+
     if (widget.prices != null) {
       priceJatengCalc = widget.prices!["priceJateng"]! * weightCalc;
       priceKlatenCalc = widget.prices!["priceKlaten"]! * weightCalc;
@@ -81,15 +82,16 @@ class _CalculatorState extends State<Calculator> {
                           child: TextField(
                             decoration:
                                 InputDecoration(label: Text(input.value)),
-                            controller: _controllers[input.key],
+                            controller: controllers[input.key],
                             onChanged: (value) {
-                              _onTextChanged();
+                              onTextChanged();
                             },
                             keyboardType: TextInputType.number,
                           ))))
                   .toList()),
           Container(
-              margin: EdgeInsets.all(8.0),
+              margin: EdgeInsets.only(
+                  left: 8.0, right: 8.0, top: 20.0, bottom: 20.0),
               child: SingleChildScrollView(
                 child: Row(
                   children: [

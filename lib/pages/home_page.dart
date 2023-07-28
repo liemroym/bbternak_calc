@@ -63,7 +63,8 @@ class _HomePageState extends State<HomePage> {
             )),
             Expanded(
                 child: Padding(
-              padding: EdgeInsets.all(20.0),
+              padding: EdgeInsets.only(
+                  left: 20.0, right: 20.0, top: 20.0, bottom: 5.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -86,7 +87,15 @@ class _HomePageState extends State<HomePage> {
                   Navigator.pushNamed(context, '/kambing');
                 },
               ),
-            ))
+            )),
+            Padding(
+              padding: EdgeInsets.all(5),
+              child: Text(
+                "© Dikembangkan oleh tim IT KKN Tim II 2022/2023 Universitas Diponegoro",
+                style: TextStyle(fontSize: 8),
+                textAlign: TextAlign.center,
+              ),
+            )
           ],
         ));
   }
