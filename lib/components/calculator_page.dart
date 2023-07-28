@@ -132,9 +132,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
           barWidth: 2,
           isStrokeCapRound: true,
           color: color,
-          dotData: FlDotData(
-            show: false,
-          ),
           spots: data
               .asMap()
               .entries
@@ -236,6 +233,14 @@ class _CalculatorPageState extends State<CalculatorPage> {
     }
   }
 
+  String? getLastDate(List<int?> price, List<String?> dates) {
+    int lastIndexFiltered = price.whereType<int>().length;
+    if (lastIndexFiltered > 0) {
+      return dates[lastIndexFiltered - 1];
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     Map<String, TextEditingController> sharedControllers = {
@@ -265,13 +270,15 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     color: Colors.red,
                     title: "Harga Jawa Tengah:",
                     value:
-                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}"),
+                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}",
+                    remark: getLastDate(priceJateng, priceDates)),
                 // Spacer(),
                 CustomTextBox(
                     color: Colors.yellow,
                     title: "Harga Klaten:",
                     value:
-                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}"),
+                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}",
+                    remark: getLastDate(priceKlaten, priceDates)),
                 // CustomTextBox(
                 //   color: Colors.blue,
                 //   title:
