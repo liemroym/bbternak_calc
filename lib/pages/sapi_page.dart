@@ -47,7 +47,8 @@ class _SapiPageState extends State<SapiPage> {
         "title": "Schoorl",
         "inputs": {"lingkarDadaCm": "Lingkar Dada (cm)"},
         "calcFunc": schoorl,
-        "sharedControllers": sharedControllers
+        "sharedControllers": sharedControllers,
+        "details": "Test detail"
       },
       {
         "title": "Winter",
@@ -56,13 +57,15 @@ class _SapiPageState extends State<SapiPage> {
           "panjangBadanCm": "Panjang Badan (cm)",
         },
         "calcFunc": winter,
-        "sharedControllers": sharedControllers
+        "sharedControllers": sharedControllers,
+        "details": "Test detail"
       },
       {
         "title": "Smith",
         "inputs": {"lingkarDadaCm": "Lingkar Dada (cm)"},
         "calcFunc": smith,
-        "sharedControllers": sharedControllers
+        "sharedControllers": sharedControllers,
+        "details": "Test detail"
       }
     ];
 

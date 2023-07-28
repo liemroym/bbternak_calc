@@ -8,11 +8,12 @@ class Calculator extends StatefulWidget {
     required this.title,
     required this.inputs,
     required this.calcFunc,
+    required this.details,
     this.prices,
     this.sharedControllers,
   });
 
-  final String title;
+  final String title, details;
   final Map<String, String> inputs; // {id: label}
   final Function calcFunc;
   final Map<String, int?>? prices;
@@ -24,6 +25,7 @@ class Calculator extends StatefulWidget {
 
 class _CalculatorState extends State<Calculator> {
   String weight = "0 kg", priceJateng = "Rp. 0", priceKlaten = "Rp. 0";
+  bool showDetail = false;
   // priceYogya = "Rp. 0";
 
   Map<String, TextEditingController> controllers = {};
@@ -71,9 +73,37 @@ class _CalculatorState extends State<Calculator> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return ExpansionTile(
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+          style: TextStyle(fontSize: 18),
+        ),
         initiallyExpanded: true,
         children: [
+          Container(
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
+              child: Column(
+                children: [
+                  Container(
+                    child: InkWell(
+                        onTap: () => setState(() {
+                              showDetail = !showDetail;
+                            }),
+                        child: Text(
+                          "Lihat detail rumus",
+                          style: TextStyle(color: Colors.blue, fontSize: 14),
+                        )),
+                    margin: EdgeInsets.only(bottom: 10.0),
+                  ),
+                  Visibility(
+                      visible: showDetail,
+                      child: Text(
+                        widget.details,
+                        style: TextStyle(fontSize: 12),
+                      )),
+                ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+              )),
           Row(
               children: widget.inputs.entries
                   .map((input) => Expanded(
@@ -82,6 +112,8 @@ class _CalculatorState extends State<Calculator> {
                           child: TextField(
                             decoration:
                                 InputDecoration(label: Text(input.value)),
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 14),
                             controller: controllers[input.key],
                             onChanged: (value) {
                               onTextChanged();

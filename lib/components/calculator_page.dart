@@ -296,6 +296,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   inputs: e["inputs"],
                   calcFunc: e["calcFunc"],
                   sharedControllers: e["sharedControllers"],
+                  details: e["details"],
                   prices: {
                     "priceJateng": lastPriceJateng,
                     "priceKlaten": lastPriceKlaten

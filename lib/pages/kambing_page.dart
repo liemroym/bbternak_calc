@@ -49,6 +49,7 @@ class _KambingPageState extends State<KambingPage> {
         },
         "calcFunc": ardjodarmoko,
         "sharedControllers": sharedControllers,
+        "details": "Test detail"
       },
       {
         "title": "Scheiffer-Lambourne",
@@ -58,6 +59,7 @@ class _KambingPageState extends State<KambingPage> {
         },
         "calcFunc": scheifferLambourne,
         "sharedControllers": sharedControllers,
+        "details": "Test detail"
       },
     ];
 
