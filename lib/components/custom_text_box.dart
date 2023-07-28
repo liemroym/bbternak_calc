@@ -29,17 +29,13 @@ class CustomTextBox extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-                fontWeight: FontWeight.w100,
-                color: textColor,
-                fontSize: MediaQuery.of(context).textScaleFactor * 14),
+                fontWeight: FontWeight.w100, color: textColor, fontSize: 14),
             textAlign: TextAlign.left,
           ),
           Text(
             value,
             style: TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-                fontSize: MediaQuery.of(context).textScaleFactor * 18),
+                color: textColor, fontWeight: FontWeight.bold, fontSize: 18),
             textAlign: TextAlign.left,
           )
         ]));

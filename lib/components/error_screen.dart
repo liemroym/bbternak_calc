@@ -18,9 +18,7 @@ class ErrorScreen extends StatelessWidget {
         ),
         Spacer(),
         Text(message,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: MediaQuery.of(context).textScaleFactor * 10))
+            textAlign: TextAlign.center, style: TextStyle(fontSize: 10))
       ],
     ));
   }

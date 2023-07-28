@@ -53,9 +53,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Text(
                         "Sapi",
-                        style: TextStyle(
-                            fontSize:
-                                MediaQuery.of(context).textScaleFactor * 18),
+                        style: TextStyle(fontSize: 18),
                       )
                     ]),
                 onPressed: () {
@@ -81,9 +79,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Text(
                         "Kambing",
-                        style: TextStyle(
-                            fontSize:
-                                MediaQuery.of(context).textScaleFactor * 18),
+                        style: TextStyle(fontSize: 18),
                       )
                     ]),
                 onPressed: () {
