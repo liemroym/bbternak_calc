@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kalkulator_bbternak/components/coachmark_desc.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +19,56 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TutorialCoachMark? tutorialCoachMark;
+  List<TargetFocus> targets = [];
+  GlobalKey ternakButtonKey = GlobalKey();
+
+  @override
+  void initState() {
+    Future.delayed(const Duration(seconds: 1), () {
+      _showTutorialCoachmark();
+    });
+    super.initState();
+  }
+
+  void _showTutorialCoachmark() {
+    targets = [
+      TargetFocus(
+          identify: "ternak-button-key",
+          keyTarget: ternakButtonKey,
+          shape: ShapeLightFocus.RRect,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              builder: (context, controller) {
+                return CoachmarkDesc(
+                  text:
+                      "Klik tombol ternak sesuai kebutuhan untuk menuju ke kalkulator",
+                  onNext: () {
+                    controller.next();
+                  },
+                  onSkip: () {
+                    controller.skip();
+                  },
+                );
+              },
+            )
+          ])
+    ];
+    tutorialCoachMark = TutorialCoachMark(
+      targets: targets,
+      pulseEnable: false,
+      colorShadow: Colors.green.withAlpha(64),
+      onClickTarget: (target) {
+        print("${target.identify}");
+      },
+      hideSkip: true,
+      onFinish: () {
+        print("Finish");
+      },
+    )..show(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -39,6 +91,7 @@ class _HomePageState extends State<HomePage> {
                 child: Padding(
               padding: EdgeInsets.all(20.0),
               child: ElevatedButton(
+                key: ternakButtonKey,
                 style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -91,7 +144,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: EdgeInsets.all(5),
               child: Text(
-                "© Dikembangkan oleh tim IT KKN Tim II 2022/2023 Universitas Diponegoro",
+                "© Dikembangkan oleh tim IT KKN Tim II Desa Troketon 2022/2023 Universitas Diponegoro",
                 style: TextStyle(fontSize: 8),
                 textAlign: TextAlign.center,
               ),

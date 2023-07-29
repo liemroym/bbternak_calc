@@ -9,6 +9,9 @@ import 'package:kalkulator_bbternak/components/calculator.dart';
 import 'package:kalkulator_bbternak/components/custom_text_box.dart';
 import 'package:kalkulator_bbternak/components/error_screen.dart';
 import 'package:kalkulator_bbternak/components/loading_screen.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+
+import 'coachmark_desc.dart';
 
 class CalculatorPage extends StatefulWidget {
   const CalculatorPage(
@@ -30,6 +33,11 @@ class _CalculatorPageState extends State<CalculatorPage> {
   List<int?> priceJateng = [], priceYogya = [], priceKlaten = [];
   List<String?> priceDates = [];
   int lastPriceJateng = 0, lastPriceYogya = 0, lastPriceKlaten = 0;
+  TutorialCoachMark? tutorialCoachMark;
+  List<TargetFocus> targets = [];
+  GlobalKey chartKey = GlobalKey();
+  GlobalKey priceKey = GlobalKey();
+  GlobalKey calcKey = GlobalKey();
 
   Widget priceChart = LoadingScreen();
 
@@ -114,7 +122,92 @@ class _CalculatorPageState extends State<CalculatorPage> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(const Duration(seconds: 1), () {
+      _showTutorialCoachmark();
+    });
+
     initPrice();
+  }
+
+  void _showTutorialCoachmark() {
+    targets = [
+      TargetFocus(
+          identify: "chart-key",
+          keyTarget: chartKey,
+          shape: ShapeLightFocus.RRect,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              builder: (context, controller) {
+                return CoachmarkDesc(
+                  text:
+                      "Grafik garis berisikan perkembangan harga ternak. Data harga diperoleh dari website pemerintah: simponiternak.pertanian.go.id",
+                  onNext: () {
+                    controller.next();
+                  },
+                  onSkip: () {
+                    controller.skip();
+                  },
+                );
+              },
+            )
+          ]),
+      TargetFocus(
+          identify: "price-key",
+          keyTarget: priceKey,
+          shape: ShapeLightFocus.RRect,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              builder: (context, controller) {
+                return CoachmarkDesc(
+                  text:
+                      "Harga ternak terbaru (Rp per kg/BH (Berat Hidup)) serta tanggal harga terakhir diambil (digunakan dalam penghitungan harga sapi)",
+                  onNext: () {
+                    controller.next();
+                  },
+                  onSkip: () {
+                    controller.skip();
+                  },
+                );
+              },
+            )
+          ]),
+      TargetFocus(
+          identify: "calc-key",
+          keyTarget: calcKey,
+          shape: ShapeLightFocus.RRect,
+          contents: [
+            TargetContent(
+              align: ContentAlign.top,
+              builder: (context, controller) {
+                return CoachmarkDesc(
+                  text: "Bagian kalkulator dengan berbagai macam rumus",
+                  image: "assets/images/calc_description.png",
+                  onNext: () {
+                    controller.next();
+                  },
+                  onSkip: () {
+                    controller.skip();
+                  },
+                );
+              },
+            )
+          ]),
+    ];
+    tutorialCoachMark = TutorialCoachMark(
+      targets: targets,
+      pulseEnable: false,
+      colorShadow: Colors.green.withAlpha(64),
+      onClickTarget: (target) {
+        print("${target.identify}");
+      },
+      hideSkip: true,
+      onFinish: () {
+        Navigator.pushNamed(context, '/sapi');
+        print("Finish");
+      },
+    )..show(context: context);
   }
 
   void initPrice() async {
@@ -255,11 +348,13 @@ class _CalculatorPageState extends State<CalculatorPage> {
       ),
       body: ListView(children: [
         Container(
+            key: chartKey,
             width: 50,
             height: MediaQuery.of(context).textScaleFactor * 200,
             margin: EdgeInsets.all(20),
             child: priceChart),
         Container(
+          key: priceKey,
           alignment: Alignment.center,
           margin: EdgeInsets.all(20),
           child: SingleChildScrollView(
@@ -270,14 +365,14 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     color: Colors.red,
                     title: "Harga Jawa Tengah:",
                     value:
-                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)}",
+                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)} / kgBH",
                     remark: getLastDate(priceJateng, priceDates)),
                 // Spacer(),
                 CustomTextBox(
                     color: Colors.yellow,
                     title: "Harga Klaten:",
                     value:
-                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)}",
+                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)} / kgBH",
                     remark: getLastDate(priceKlaten, priceDates)),
                 // CustomTextBox(
                 //   color: Colors.blue,
@@ -290,20 +385,27 @@ class _CalculatorPageState extends State<CalculatorPage> {
             scrollDirection: Axis.horizontal,
           ),
         ),
-        ...widget.calcData
-            .map((e) => Calculator(
-                  title: e["title"],
-                  inputs: e["inputs"],
-                  calcFunc: e["calcFunc"],
-                  sharedControllers: e["sharedControllers"],
-                  details: e["details"],
-                  prices: {
-                    "priceJateng": lastPriceJateng,
-                    "priceKlaten": lastPriceKlaten
-                    // "priceYogya": lastPriceYogya,
-                  },
-                ))
-            .toList()
+        Container(
+          key: calcKey,
+          child: Column(
+            children: [
+              ...widget.calcData
+                  .map((e) => Calculator(
+                        title: e["title"],
+                        inputs: e["inputs"],
+                        calcFunc: e["calcFunc"],
+                        sharedControllers: e["sharedControllers"],
+                        details: e["details"],
+                        prices: {
+                          "priceJateng": lastPriceJateng,
+                          "priceKlaten": lastPriceKlaten
+                          // "priceYogya": lastPriceYogya,
+                        },
+                      ))
+                  .toList()
+            ],
+          ),
+        ),
       ]),
     );
   }
