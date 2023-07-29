@@ -31,7 +31,7 @@ class CalculatorPage extends StatefulWidget {
 
 class _CalculatorPageState extends State<CalculatorPage> {
   static const int priceDuration = 30;
-  final LocalStorage tutorialStorage = new LocalStorage("tutorial_ended");
+  final LocalStorage localStorage = LocalStorage("storage");
 
   List<int?> priceJateng = [], priceYogya = [], priceKlaten = [];
   List<String?> priceDates = [];
@@ -128,11 +128,11 @@ class _CalculatorPageState extends State<CalculatorPage> {
   void initState() {
     super.initState();
     Future(() async {
-      await tutorialStorage.ready;
-      if (await tutorialStorage.getItem("showTutorial") == null) {
+      await localStorage.ready;
+      if (await localStorage.getItem("showTutorial") == null) {
         _showTutorialCoachmark();
       } else {
-        if (await tutorialStorage.getItem("showTutorial")) {
+        if (await localStorage.getItem("showTutorial")) {
           _showTutorialCoachmark();
         }
       }
@@ -234,9 +234,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
       onClickTarget: (target) {
         Future(
           () async {
-            await tutorialStorage.ready;
+            await localStorage.ready;
             if (target.identify == "calc-key") {
-              await tutorialStorage.setItem("showTutorial", false);
+              await localStorage.setItem("showTutorial", false);
             }
           },
         );
@@ -245,8 +245,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
       onFinish: () {
         Future(
           () async {
-            await tutorialStorage.ready;
-            await tutorialStorage.setItem("showTutorial", false);
+            await localStorage.ready;
+            await localStorage.setItem("showTutorial", false);
           },
         );
       },
@@ -254,37 +254,55 @@ class _CalculatorPageState extends State<CalculatorPage> {
   }
 
   void initPrice() async {
+    LineChartBarData getChartSpotsFromList(Color color, List<int?> data) {
+      return LineChartBarData(
+        isCurved: true,
+        barWidth: 2,
+        isStrokeCapRound: true,
+        color: color,
+        spots: data
+            .asMap()
+            .entries
+            .map((price) {
+              if (price.value != null) {
+                return FlSpot(price.key.toDouble(), price.value!.toDouble());
+              }
+            })
+            .whereType<FlSpot>()
+            .toList(),
+      );
+    }
+
+    Map<String, List<dynamic>?>? value;
+
+    Future(() async {
+      await localStorage.ready;
+      value = await localStorage.getItem("price");
+    });
+
     try {
-      // Fetch past  days data from government website
-      Map<String, List<dynamic>?> value = await fetchPriceData(
+      // Fetch past days data from government website
+      value = await fetchPriceData(
               DateTime.now().subtract(const Duration(days: priceDuration)),
               DateTime.now())
-          // Add timeout for 10 seconds
-          .timeout(Duration(seconds: 10));
-
-      LineChartBarData getChartSpotsFromList(Color color, List<int?> data) {
-        return LineChartBarData(
-          isCurved: true,
-          barWidth: 2,
-          isStrokeCapRound: true,
-          color: color,
-          spots: data
-              .asMap()
-              .entries
-              .map((price) {
-                if (price.value != null) {
-                  return FlSpot(price.key.toDouble(), price.value!.toDouble());
-                }
-              })
-              .whereType<FlSpot>()
-              .toList(),
-        );
+          // Add timeout for 5 seconds
+          .timeout(Duration(seconds: 5));
+    } catch (err) {
+      // Handle error
+      if (value == null) {
+        setState(() {
+          priceChart = ErrorScreen(
+              message:
+                  "Tidak dapat mengambil data harga, pastikan anda terhubung dengan koneksi internet");
+        });
       }
+    }
 
+    if (value != null) {
       setState(() {
-        priceDates = value["priceDates"]!.cast<String?>();
-        priceJateng = value["priceJateng"]!.cast<int?>();
-        priceKlaten = value["priceKlaten"]!.cast<int?>();
+        priceDates = value!["priceDates"]!.cast<String?>();
+        priceJateng = value!["priceJateng"]!.cast<int?>();
+        priceKlaten = value!["priceKlaten"]!.cast<int?>();
         // priceYogya = value["priceYogya"]!.cast<int?>();
 
         List<int>? priceJatengFiltered = priceJateng.whereType<int>().toList();
@@ -355,16 +373,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
               // getChartSpotsFromList(Colors.blue, priceYogya)
             ]));
       });
-    } on TimeoutException catch (_) {
-      setState(() {
-        priceChart = const ErrorScreen(
-            message:
-                "Tidak dapat mengambil data harga, pastikan anda terhubung dengan koneksi internet");
-      });
-    } catch (err) {
-      // Handle error
-      setState(() {
-        priceChart = ErrorScreen(message: err.toString().substring(11));
+      Future(() async {
+        await localStorage.ready;
+        await localStorage.setItem("price", value);
       });
     }
   }

@@ -14,17 +14,17 @@ class _HomePageState extends State<HomePage> {
   TutorialCoachMark? tutorialCoachMark;
   List<TargetFocus> targets = [];
   GlobalKey ternakButtonKey = GlobalKey();
-  LocalStorage tutorialStorage = new LocalStorage("tutorial_ended");
+  LocalStorage localStorage = LocalStorage("storage");
 
   @override
   void initState() {
     super.initState();
     Future(() async {
-      await tutorialStorage.ready;
-      if (await tutorialStorage.getItem("showTutorial") == null) {
+      await localStorage.ready;
+      if (await localStorage.getItem("showTutorial") == null) {
         _showTutorialCoachmark();
       } else {
-        if (await tutorialStorage.getItem("showTutorial")) {
+        if (await localStorage.getItem("showTutorial")) {
           _showTutorialCoachmark();
         }
       }
