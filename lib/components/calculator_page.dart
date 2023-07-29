@@ -174,7 +174,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
               builder: (context, controller) {
                 return CoachmarkDesc(
                   text:
-                      "Harga ternak terbaru (Rp per kg/BH (Berat Hidup)) serta tanggal harga terakhir diambil (digunakan dalam penghitungan harga sapi)",
+                      "Geser ke kanan atau ke kiri untuk melihat harga ternak terbaru (Rp per kg/BH (Berat Hidup)) serta tanggal harga terakhir diambil (digunakan dalam penghitungan harga sapi) untuk daerah Jawa Tengah, Yogya, dan Klaten",
                   onNext: () {
                     controller.next();
                   },
@@ -273,7 +273,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
       );
     }
 
-    Map<String, List<dynamic>?>? value;
+    Map<String, dynamic>? value;
 
     Future(() async {
       await localStorage.ready;
@@ -303,18 +303,18 @@ class _CalculatorPageState extends State<CalculatorPage> {
         priceDates = value!["priceDates"]!.cast<String?>();
         priceJateng = value!["priceJateng"]!.cast<int?>();
         priceKlaten = value!["priceKlaten"]!.cast<int?>();
-        // priceYogya = value["priceYogya"]!.cast<int?>();
+        priceYogya = value!["priceYogya"]!.cast<int?>();
 
         List<int>? priceJatengFiltered = priceJateng.whereType<int>().toList();
         List<int>? priceKlatenFiltered = priceKlaten.whereType<int>().toList();
-        // List<int>? priceYogyaFiltered = priceYogya.whereType<int>().toList();
+        List<int>? priceYogyaFiltered = priceYogya.whereType<int>().toList();
 
         lastPriceJateng =
             priceJatengFiltered.isNotEmpty ? priceJatengFiltered.last : 0;
         lastPriceKlaten =
             priceKlatenFiltered.isNotEmpty ? priceKlatenFiltered.last : 0;
-        // lastPriceYogya =
-        //     priceYogyaFiltered.isNotEmpty ? priceYogyaFiltered.last : 0;
+        lastPriceYogya =
+            priceYogyaFiltered.isNotEmpty ? priceYogyaFiltered.last : 0;
 
         priceChart = LineChart(LineChartData(
             minX: 0,
@@ -370,7 +370,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
             lineBarsData: [
               getChartSpotsFromList(Colors.red, priceJateng),
               getChartSpotsFromList(Colors.yellow, priceKlaten),
-              // getChartSpotsFromList(Colors.blue, priceYogya)
+              getChartSpotsFromList(Colors.blue, priceYogya)
             ]));
       });
       Future(() async {
@@ -422,26 +422,24 @@ class _CalculatorPageState extends State<CalculatorPage> {
           child: SingleChildScrollView(
             child: Row(
               children: [
-                // Spacer(),
                 CustomTextBox(
                     color: Colors.red,
                     title: "Harga Jawa Tengah:",
                     value:
                         "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)} / kgBH",
                     remark: getLastDate(priceJateng, priceDates)),
-                // Spacer(),
                 CustomTextBox(
                     color: Colors.yellow,
                     title: "Harga Klaten:",
                     value:
                         "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)} / kgBH",
                     remark: getLastDate(priceKlaten, priceDates)),
-                // CustomTextBox(
-                //   color: Colors.blue,
-                //   title:
-                //       "Harga Yogyakarta:\nRp. ${NumberFormat('#,##0.00').format(lastPriceYogya)}"                  value: )
-                // ),,
-                // Spacer(),
+                CustomTextBox(
+                    color: Colors.blue,
+                    title: "Harga Yogya:",
+                    value:
+                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceYogya)} / kgBH",
+                    remark: getLastDate(priceYogya, priceDates)),
               ],
             ),
             scrollDirection: Axis.horizontal,
@@ -460,8 +458,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
                         details: e["details"],
                         prices: {
                           "priceJateng": lastPriceJateng,
-                          "priceKlaten": lastPriceKlaten
-                          // "priceYogya": lastPriceYogya,
+                          "priceKlaten": lastPriceKlaten,
+                          "priceYogya": lastPriceYogya,
                         },
                       ))
                   .toList()

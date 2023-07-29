@@ -24,9 +24,11 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  String weight = "0 kg", priceJateng = "Rp. 0", priceKlaten = "Rp. 0";
+  String weight = "0 kg",
+      priceJateng = "Rp. 0",
+      priceKlaten = "Rp. 0",
+      priceYogya = "Rp. 0";
   bool showDetail = true;
-  // priceYogya = "Rp. 0";
 
   Map<String, TextEditingController> controllers = {};
 
@@ -53,25 +55,19 @@ class _CalculatorState extends State<Calculator> {
     if (widget.prices != null) {
       priceJatengCalc = widget.prices!["priceJateng"]! * weightCalc;
       priceKlatenCalc = widget.prices!["priceKlaten"]! * weightCalc;
-      // priceYogyaCalc = widget.prices!["priceYogya"]! * weightCalc;
+      priceYogyaCalc = widget.prices!["priceYogya"]! * weightCalc;
     }
 
     setState(() {
       weight = "${NumberFormat('#,##0.00').format(weightCalc)} kg";
       priceJateng = "Rp. ${NumberFormat('#,##0.00').format(priceJatengCalc)}";
       priceKlaten = "Rp. ${NumberFormat('#,##0.00').format(priceKlatenCalc)}";
-      // priceYogya = "Rp. ${NumberFormat('#,##0.00').format(priceYogyaCalc)}";
+      priceYogya = "Rp. ${NumberFormat('#,##0.00').format(priceYogyaCalc)}";
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return ExpansionTile(
         title: Text(
           widget.title,
@@ -139,11 +135,10 @@ class _CalculatorState extends State<Calculator> {
                         color: Colors.yellow,
                         title: "Harga Klaten:",
                         value: priceKlaten),
-                    // CustomTextBox(
-                    //   color: Colors.blue,
-                    //   text: "Harga Yogya:\n$priceYogya",
-                    // ),
-                    // const Spacer(),
+                    CustomTextBox(
+                        color: Colors.blue,
+                        title: "Harga Yogya:",
+                        value: priceYogya),
                   ],
                 ),
                 scrollDirection: Axis.horizontal,
