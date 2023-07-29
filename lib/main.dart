@@ -14,7 +14,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BBTernak Calculator',
+      title: 'BBTernak Kalkulator',
       theme: ThemeData(
         fontFamily: "Poppins",
         primarySwatch: Colors.green,

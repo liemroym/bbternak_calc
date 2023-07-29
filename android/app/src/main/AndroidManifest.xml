@@ -2,7 +2,7 @@
     package="com.example.kalkulator_bbternak">
    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="BBTernak Calc"
+        android:label="BBTernak Kalkulator"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
