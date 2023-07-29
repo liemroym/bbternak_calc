@@ -9,6 +9,7 @@ import 'package:kalkulator_bbternak/components/calculator.dart';
 import 'package:kalkulator_bbternak/components/custom_text_box.dart';
 import 'package:kalkulator_bbternak/components/error_screen.dart';
 import 'package:kalkulator_bbternak/components/loading_screen.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import 'coachmark_desc.dart';
@@ -30,14 +31,18 @@ class CalculatorPage extends StatefulWidget {
 
 class _CalculatorPageState extends State<CalculatorPage> {
   static const int priceDuration = 30;
+  final LocalStorage tutorialStorage = new LocalStorage("tutorial_ended");
+
   List<int?> priceJateng = [], priceYogya = [], priceKlaten = [];
   List<String?> priceDates = [];
   int lastPriceJateng = 0, lastPriceYogya = 0, lastPriceKlaten = 0;
   TutorialCoachMark? tutorialCoachMark;
   List<TargetFocus> targets = [];
+
   GlobalKey chartKey = GlobalKey();
   GlobalKey priceKey = GlobalKey();
   GlobalKey calcKey = GlobalKey();
+  GlobalKey helpKey = GlobalKey();
 
   Widget priceChart = LoadingScreen();
 
@@ -122,8 +127,15 @@ class _CalculatorPageState extends State<CalculatorPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1), () {
-      _showTutorialCoachmark();
+    Future(() async {
+      await tutorialStorage.ready;
+      if (await tutorialStorage.getItem("showTutorial") == null) {
+        _showTutorialCoachmark();
+      } else {
+        if (await tutorialStorage.getItem("showTutorial")) {
+          _showTutorialCoachmark();
+        }
+      }
     });
 
     initPrice();
@@ -194,18 +206,49 @@ class _CalculatorPageState extends State<CalculatorPage> {
               },
             )
           ]),
+      TargetFocus(
+          identify: "help-key",
+          keyTarget: helpKey,
+          shape: ShapeLightFocus.Circle,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              builder: (context, controller) {
+                return CoachmarkDesc(
+                  text: "Untuk mengulangi tutorial, tekan tombol '?' ini",
+                  onNext: () {
+                    controller.next();
+                  },
+                  onSkip: () {
+                    controller.skip();
+                  },
+                );
+              },
+            )
+          ]),
     ];
     tutorialCoachMark = TutorialCoachMark(
       targets: targets,
       pulseEnable: false,
       colorShadow: Colors.green.withAlpha(64),
       onClickTarget: (target) {
-        print("${target.identify}");
+        Future(
+          () async {
+            await tutorialStorage.ready;
+            if (target.identify == "calc-key") {
+              await tutorialStorage.setItem("showTutorial", false);
+            }
+          },
+        );
       },
       hideSkip: true,
       onFinish: () {
-        Navigator.pushNamed(context, '/sapi');
-        print("Finish");
+        Future(
+          () async {
+            await tutorialStorage.ready;
+            await tutorialStorage.setItem("showTutorial", false);
+          },
+        );
       },
     )..show(context: context);
   }
@@ -342,9 +385,17 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the KambingPage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            key: helpKey,
+            icon: const Icon(Icons.question_mark),
+            tooltip: 'Membuka ulang tutorial',
+            onPressed: () {
+              _showTutorialCoachmark();
+            },
+          ),
+        ],
       ),
       body: ListView(children: [
         Container(

@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kalkulator_bbternak/components/coachmark_desc.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -22,13 +14,21 @@ class _HomePageState extends State<HomePage> {
   TutorialCoachMark? tutorialCoachMark;
   List<TargetFocus> targets = [];
   GlobalKey ternakButtonKey = GlobalKey();
+  LocalStorage tutorialStorage = new LocalStorage("tutorial_ended");
 
   @override
   void initState() {
-    Future.delayed(const Duration(seconds: 1), () {
-      _showTutorialCoachmark();
-    });
     super.initState();
+    Future(() async {
+      await tutorialStorage.ready;
+      if (await tutorialStorage.getItem("showTutorial") == null) {
+        _showTutorialCoachmark();
+      } else {
+        if (await tutorialStorage.getItem("showTutorial")) {
+          _showTutorialCoachmark();
+        }
+      }
+    });
   }
 
   void _showTutorialCoachmark() {
@@ -60,11 +60,11 @@ class _HomePageState extends State<HomePage> {
       pulseEnable: false,
       colorShadow: Colors.green.withAlpha(64),
       onClickTarget: (target) {
-        print("${target.identify}");
+        // print("${target.identify}");
       },
       hideSkip: true,
       onFinish: () {
-        print("Finish");
+        // print("Finish");
       },
     )..show(context: context);
   }
@@ -82,6 +82,15 @@ class _HomePageState extends State<HomePage> {
           // Here we take the value from the HomePage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: Text("Kalkulator BB Ternak"),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.question_mark),
+              tooltip: 'Membuka ulang tutorial',
+              onPressed: () {
+                _showTutorialCoachmark();
+              },
+            ),
+          ],
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -105,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                             fit: BoxFit.cover),
                       ),
                       Text(
-                        "Sapi",
+                        "Kalkulator Sapi",
                         style: TextStyle(fontSize: 18),
                       )
                     ]),
@@ -132,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                             fit: BoxFit.cover),
                       ),
                       Text(
-                        "Kambing",
+                        "Kalkulator Kambing",
                         style: TextStyle(fontSize: 18),
                       )
                     ]),

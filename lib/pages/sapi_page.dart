@@ -48,7 +48,8 @@ class _SapiPageState extends State<SapiPage> {
         "inputs": {"lingkarDadaCm": "Lingkar Dada (cm)"},
         "calcFunc": schoorl,
         "sharedControllers": sharedControllers,
-        "details": "Test detail"
+        "details":
+            "Paling banyak digunakan di Indonesia. Lebih mudah digunakan karena hanya perlu mengukur sekali, namun akurasi lebih rendah (tingkat kesalahan 22%)"
       },
       {
         "title": "Winter",
@@ -58,17 +59,20 @@ class _SapiPageState extends State<SapiPage> {
         },
         "calcFunc": winter,
         "sharedControllers": sharedControllers,
-        "details": "Test detail"
+        "details":
+            "Akurasi tinggi (tingkat kesalahan 2-6%), namun harus mengukur dua kali"
       },
       {
         "title": "Smith",
         "inputs": {"lingkarDadaCm": "Lingkar Dada (cm)"},
         "calcFunc": smith,
         "sharedControllers": sharedControllers,
-        "details": "Test detail"
+        "details":
+            "Mirip dengan rumus Schoorl, namun kurang cocok digunakan untuk sapi Indonesia"
       }
     ];
 
-    return CalculatorPage(title: "Sapi", calcData: calcData, ternakId: 3);
+    return CalculatorPage(
+        title: "Kalkulator Sapi", calcData: calcData, ternakId: 3);
   }
 }

@@ -42,16 +42,6 @@ class _KambingPageState extends State<KambingPage> {
 
     List<Map<String, dynamic>> calcData = [
       {
-        "title": "Ardjodarmoko",
-        "inputs": {
-          "lingkarDadaCm": "Lingkar Dada (cm)",
-          "panjangBadanCm": "Panjang Badan (cm)"
-        },
-        "calcFunc": ardjodarmoko,
-        "sharedControllers": sharedControllers,
-        "details": "Test detail"
-      },
-      {
         "title": "Scheiffer-Lambourne",
         "inputs": {
           "lingkarDadaCm": "Lingkar Dada (cm)",
@@ -59,10 +49,23 @@ class _KambingPageState extends State<KambingPage> {
         },
         "calcFunc": scheifferLambourne,
         "sharedControllers": sharedControllers,
-        "details": "Test detail"
+        "details":
+            "Paling sering digunakan di Indonesia, namun meskipun memiliki 2 parameter yang diukur, akurasi tidak setinggi rumus untuk sapi"
+      },
+      {
+        "title": "Ardjodarmoko",
+        "inputs": {
+          "lingkarDadaCm": "Lingkar Dada (cm)",
+          "panjangBadanCm": "Panjang Badan (cm)"
+        },
+        "calcFunc": ardjodarmoko,
+        "sharedControllers": sharedControllers,
+        "details":
+            "Penyempurnaan rumus Winter sapi untuk menghitung berat badan kambing, namun sekarang jarang digunakan di Indonesia"
       },
     ];
 
-    return CalculatorPage(title: "Kambing", calcData: calcData, ternakId: 5);
+    return CalculatorPage(
+        title: "Kalkulator Kambing", calcData: calcData, ternakId: 5);
   }
 }

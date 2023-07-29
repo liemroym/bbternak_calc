@@ -25,7 +25,7 @@ class Calculator extends StatefulWidget {
 
 class _CalculatorState extends State<Calculator> {
   String weight = "0 kg", priceJateng = "Rp. 0", priceKlaten = "Rp. 0";
-  bool showDetail = false;
+  bool showDetail = true;
   // priceYogya = "Rp. 0";
 
   Map<String, TextEditingController> controllers = {};

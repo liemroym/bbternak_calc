@@ -41,6 +41,7 @@ dependencies:
   intl: ^0.18.1
   fl_chart: ^0.62.0
   tutorial_coach_mark: any
+  localstorage: ^4.0.1+4
 
 dev_dependencies:
   flutter_test:
