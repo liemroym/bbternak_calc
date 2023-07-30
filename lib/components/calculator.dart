@@ -79,8 +79,10 @@ class _CalculatorState extends State<Calculator> {
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
+                    margin: EdgeInsets.only(bottom: 10.0),
                     child: InkWell(
                         onTap: () => setState(() {
                               showDetail = !showDetail;
@@ -89,7 +91,6 @@ class _CalculatorState extends State<Calculator> {
                           "Lihat detail rumus",
                           style: TextStyle(color: Colors.blue, fontSize: 14),
                         )),
-                    margin: EdgeInsets.only(bottom: 10.0),
                   ),
                   Visibility(
                       visible: showDetail,
@@ -98,7 +99,6 @@ class _CalculatorState extends State<Calculator> {
                         style: TextStyle(fontSize: 12),
                       )),
                 ],
-                crossAxisAlignment: CrossAxisAlignment.start,
               )),
           Row(
               children: widget.inputs.entries
@@ -121,6 +121,7 @@ class _CalculatorState extends State<Calculator> {
               margin: EdgeInsets.only(
                   left: 8.0, right: 8.0, top: 20.0, bottom: 20.0),
               child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
                     CustomTextBox(
@@ -141,7 +142,6 @@ class _CalculatorState extends State<Calculator> {
                         value: priceYogya),
                   ],
                 ),
-                scrollDirection: Axis.horizontal,
               )),
         ]);
   }

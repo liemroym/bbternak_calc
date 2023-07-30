@@ -158,6 +158,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     controller.next();
                   },
                   onSkip: () {
+                    Future(
+                      () async {
+                        await localStorage.ready;
+                        await localStorage.setItem("showTutorial", false);
+                      },
+                    );
                     controller.skip();
                   },
                 );
@@ -179,6 +185,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     controller.next();
                   },
                   onSkip: () {
+                    Future(
+                      () async {
+                        await localStorage.ready;
+                        await localStorage.setItem("showTutorial", false);
+                      },
+                    );
                     controller.skip();
                   },
                 );
@@ -200,6 +212,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     controller.next();
                   },
                   onSkip: () {
+                    Future(
+                      () async {
+                        await localStorage.ready;
+                        await localStorage.setItem("showTutorial", false);
+                      },
+                    );
                     controller.skip();
                   },
                 );
@@ -220,6 +238,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     controller.next();
                   },
                   onSkip: () {
+                    Future(
+                      () async {
+                        await localStorage.ready;
+                        await localStorage.setItem("showTutorial", false);
+                      },
+                    );
                     controller.skip();
                   },
                 );
@@ -235,7 +259,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
         Future(
           () async {
             await localStorage.ready;
-            if (target.identify == "calc-key") {
+            if (target.identify == "help-key") {
               await localStorage.setItem("showTutorial", false);
             }
           },
@@ -277,7 +301,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
     Future(() async {
       await localStorage.ready;
-      value = await localStorage.getItem("price");
+      value = await localStorage.getItem("${widget.ternakId}-price");
     });
 
     try {
@@ -375,7 +399,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
       });
       Future(() async {
         await localStorage.ready;
-        await localStorage.setItem("price", value);
+        await localStorage.setItem("${widget.ternakId}-price", value);
       });
     }
   }
@@ -408,65 +432,68 @@ class _CalculatorPageState extends State<CalculatorPage> {
           ),
         ],
       ),
-      body: ListView(children: [
-        Container(
-            key: chartKey,
-            width: 50,
-            height: MediaQuery.of(context).textScaleFactor * 200,
+      body: ListView(
+        primary: false,
+        children: [
+          Container(
+              key: chartKey,
+              width: 50,
+              height: MediaQuery.of(context).textScaleFactor * 200,
+              margin: EdgeInsets.all(20),
+              child: priceChart),
+          Container(
+            key: priceKey,
+            alignment: Alignment.center,
             margin: EdgeInsets.all(20),
-            child: priceChart),
-        Container(
-          key: priceKey,
-          alignment: Alignment.center,
-          margin: EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            child: Row(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  CustomTextBox(
+                      color: Colors.red,
+                      title: "Harga Jawa Tengah:",
+                      value:
+                          "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)} / kgBH",
+                      remark: getLastDate(priceJateng, priceDates)),
+                  CustomTextBox(
+                      color: Colors.yellow,
+                      title: "Harga Klaten:",
+                      value:
+                          "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)} / kgBH",
+                      remark: getLastDate(priceKlaten, priceDates)),
+                  CustomTextBox(
+                      color: Colors.blue,
+                      title: "Harga Yogya:",
+                      value:
+                          "Rp. ${NumberFormat('#,##0.00').format(lastPriceYogya)} / kgBH",
+                      remark: getLastDate(priceYogya, priceDates)),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            key: calcKey,
+            child: Column(
               children: [
-                CustomTextBox(
-                    color: Colors.red,
-                    title: "Harga Jawa Tengah:",
-                    value:
-                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceJateng)} / kgBH",
-                    remark: getLastDate(priceJateng, priceDates)),
-                CustomTextBox(
-                    color: Colors.yellow,
-                    title: "Harga Klaten:",
-                    value:
-                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceKlaten)} / kgBH",
-                    remark: getLastDate(priceKlaten, priceDates)),
-                CustomTextBox(
-                    color: Colors.blue,
-                    title: "Harga Yogya:",
-                    value:
-                        "Rp. ${NumberFormat('#,##0.00').format(lastPriceYogya)} / kgBH",
-                    remark: getLastDate(priceYogya, priceDates)),
+                ...widget.calcData
+                    .map((e) => Calculator(
+                          title: e["title"],
+                          inputs: e["inputs"],
+                          calcFunc: e["calcFunc"],
+                          sharedControllers: e["sharedControllers"],
+                          details: e["details"],
+                          prices: {
+                            "priceJateng": lastPriceJateng,
+                            "priceKlaten": lastPriceKlaten,
+                            "priceYogya": lastPriceYogya,
+                          },
+                        ))
+                    .toList()
               ],
             ),
-            scrollDirection: Axis.horizontal,
           ),
-        ),
-        Container(
-          key: calcKey,
-          child: Column(
-            children: [
-              ...widget.calcData
-                  .map((e) => Calculator(
-                        title: e["title"],
-                        inputs: e["inputs"],
-                        calcFunc: e["calcFunc"],
-                        sharedControllers: e["sharedControllers"],
-                        details: e["details"],
-                        prices: {
-                          "priceJateng": lastPriceJateng,
-                          "priceKlaten": lastPriceKlaten,
-                          "priceYogya": lastPriceYogya,
-                        },
-                      ))
-                  .toList()
-            ],
-          ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }
