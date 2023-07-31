@@ -1,16 +1,4 @@
-# kalkulator_bbternak
+# BBTernak Kalkulator
 
-A new Flutter project.
+Calculator to guess weight of ruminants farm animals (cows and goats) using multiple formulas. Also provided feature to fetch price data from government's website (simponiternak.go.id). Developed with Flutter for Diponegoro University's community service program (KKN Tim II Universitas Diponegoro - Desa Troketon) on July - August 2023.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
